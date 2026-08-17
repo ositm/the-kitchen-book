@@ -42,3 +42,6 @@ next-env.d.ts
 
 # temp prompt scratch files
 temp_*.txt
+
+# local scripts
+/scripts/

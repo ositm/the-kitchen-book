@@ -1,48 +1,102 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf7f5;
-  --foreground: #2d2320;
+  /* Warm Culinary Palette */
+  --background: #FFF9ED;
+  --background-secondary: #F6F3EA;
+  --foreground: #1F2937;
   
-  --primary: #e25d36;
-  --primary-foreground: #ffffff;
-  
-  --card: #ffffff;
-  --card-foreground: #2d2320;
-  
-  --border: #e6dfdb;
+  /* Primary Brand: Forest Green */
+  --primary: #18533A;
+  --primary-foreground: #FFFFFF;
+  --primary-dark: #113E2B;
+  --primary-light: #EBF5EE;
+  --primary-subtle: #D8ECE0;
+
+  /* Secondary Green: Soft Sage */
+  --sage: #A8C59A;
+  --sage-light: #F2F7F0;
+  --sage-border: #C8DEC0;
+
+  /* Warm Food Accent: Appetite Orange */
+  --accent: #FF8A3D;
+  --accent-foreground: #FFFFFF;
+  --accent-light: #FFF2EB;
+  --accent-dark: #E66E20;
+
+  /* Crisp White Card Surfaces */
+  --card: #FFFFFF;
+  --card-foreground: #1F2937;
+  --card-warm: #FBF9F4;
+  --card-muted: #F6F3EA;
+
+  /* Neutrals & Borders */
+  --muted: #F3EFE6;
+  --muted-foreground: #6B7280;
+  --border: #EAE4D7;
+  --border-light: #F0ECE3;
+  --ring: #18533A;
+
+  /* Feedback Colors */
+  --success: #2E8B57;
+  --warning: #F59E0B;
+  --error: #DC5A4A;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-sage: var(--sage);
+  --color-sage-light: var(--sage-light);
+  --color-sage-border: var(--sage-border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-card-warm: var(--card-warm);
+  --color-card-muted: var(--card-muted);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1c1716;
-    --foreground: #f4ece9;
-    
-    --primary: #d3522c;
-    --primary-foreground: #ffffff;
-    
-    --card: #27211f;
-    --card-foreground: #f4ece9;
-    
-    --border: #3d3432;
-  }
+  --color-border-light: var(--border-light);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --font-sans: var(--font-sans), var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-serif), Georgia, serif;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Custom utility classes */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Subtle food magazine card hover */
+.food-card-hover {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.food-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px -8px rgba(24, 83, 58, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.03);
 }
