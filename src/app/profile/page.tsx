@@ -4,7 +4,21 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePantry } from "@/lib/pantryStore";
-import { User, MapPin, ChefHat, Heart, BookOpen, Settings, Flame, Sparkles, Refrigerator } from "lucide-react";
+import { useAuth } from "@/lib/authContext";
+import AuthModal from "@/components/AuthModal";
+import {
+  User,
+  MapPin,
+  ChefHat,
+  Heart,
+  BookOpen,
+  Settings,
+  Flame,
+  Sparkles,
+  Refrigerator,
+  LogOut,
+  LogIn
+} from "lucide-react";
 
 export const SAVED_RECIPES_SAMPLE = [
   {
@@ -32,38 +46,84 @@ export const SAVED_RECIPES_SAMPLE = [
 
 export default function ProfilePage() {
   const { count, items } = usePantry();
+  const { user, signOut } = useAuth();
+
   const [activeTab, setActiveTab] = useState<"saved" | "pantry" | "activity">("saved");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "Guest Cook";
+
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
 
   return (
     <div className="flex flex-col gap-6 pb-24 max-w-2xl mx-auto">
       {/* 1. PROFILE HEADER CARD */}
       <div className="bg-white rounded-3xl p-6 border border-[#EAE4D7] shadow-xs relative overflow-hidden">
-        <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
-          {/* Avatar */}
-          <div className="relative w-20 h-20 rounded-full bg-sage-light text-primary border-2 border-sage-border flex items-center justify-center text-3xl shadow-xs">
-            👨🏾‍🍳
-          </div>
+        {user ? (
+          <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            {/* Avatar */}
+            {avatarUrl ? (
+              <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary shadow-xs">
+                <Image src={avatarUrl} alt={displayName} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="relative w-20 h-20 rounded-full bg-sage-light text-primary border-2 border-sage-border flex items-center justify-center text-3xl shadow-xs">
+                👨🏾‍🍳
+              </div>
+            )}
 
-          <div className="space-y-1 flex-1">
-            <div className="flex items-center justify-center sm:justify-start gap-2">
-              <h1 className="text-xl sm:text-2xl font-extrabold text-foreground font-serif">
-                Chef Ugo
-              </h1>
-              <span className="bg-sage-light text-primary text-[10px] font-bold px-2 py-0.5 rounded-full border border-sage-border/50">
-                Master Cook
-              </span>
+            <div className="space-y-1 flex-1 min-w-0">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-foreground font-serif truncate">
+                  {displayName}
+                </h1>
+                <span className="bg-sage-light text-primary text-[10px] font-bold px-2 py-0.5 rounded-full border border-sage-border/50 flex-shrink-0">
+                  Google Verified
+                </span>
+              </div>
+
+              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+
+              <p className="text-xs text-muted-foreground flex items-center justify-center sm:justify-start gap-1">
+                <MapPin className="w-3.5 h-3.5 text-primary" />
+                <span>Lagos State, Nigeria</span>
+              </p>
             </div>
 
-            <p className="text-xs text-muted-foreground flex items-center justify-center sm:justify-start gap-1">
-              <MapPin className="w-3.5 h-3.5 text-primary" />
-              <span>Lagos State, Nigeria</span>
-            </p>
-
-            <p className="text-xs text-foreground/80 pt-1 max-w-sm">
-              Passionate home cook exploring authentic Nigerian soups, party jollof dishes, and smart weeknight hacks.
-            </p>
+            <button
+              onClick={() => signOut()}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-xs font-bold text-red-600 hover:bg-red-50 transition-all self-center sm:self-start"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
+            </button>
           </div>
-        </div>
+        ) : (
+          <div className="text-center py-4 space-y-3">
+            <div className="w-16 h-16 rounded-2xl bg-sage-light text-primary flex items-center justify-center text-3xl mx-auto shadow-2xs">
+              👨🏾‍🍳
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-foreground font-serif">
+                Join The Kitchen Book
+              </h2>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1">
+                Sign in with Google to sync your pantry items across all your devices, save recipes, and share your cooked dishes.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-sm transition-all active:scale-98"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Sign In with Google</span>
+            </button>
+          </div>
+        )}
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-2 mt-6 pt-5 border-t border-[#F0ECE3] text-center">
@@ -162,6 +222,8 @@ export default function ProfilePage() {
           </p>
         </div>
       )}
+
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   );
 }
