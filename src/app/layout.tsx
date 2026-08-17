@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation";
 import Header from "@/components/Header";
 import AiAssistantButton from "@/components/AiAssistantButton";
 import { AuthProvider } from "@/lib/authContext";
+import { ThemeProvider } from "@/lib/themeContext";
 
 const sansFont = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -44,19 +45,22 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${sansFont.variable} ${serifFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col md:flex-row bg-[#FFF9ED] text-[#1F2937] pb-20 md:pb-0">
-        <AuthProvider>
-          <Navigation />
-          <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
-            <Header />
-            <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 md:py-6 lg:px-8">
-              {children}
-            </main>
-          </div>
-          <AiAssistantButton />
-        </AuthProvider>
+      <body className="min-h-full flex flex-col md:flex-row bg-background text-foreground pb-20 md:pb-0">
+        <ThemeProvider>
+          <AuthProvider>
+            <Navigation />
+            <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
+              <Header />
+              <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-4 sm:px-6 md:py-6 lg:px-8">
+                {children}
+              </main>
+            </div>
+            <AiAssistantButton />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

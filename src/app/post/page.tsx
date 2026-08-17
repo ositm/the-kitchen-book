@@ -90,13 +90,13 @@ export default function PostPage() {
       </div>
 
       {!isPosted ? (
-        <form onSubmit={handleSubmit} className="space-y-5 bg-white rounded-3xl p-6 border border-[#EAE4D7] shadow-xs">
+        <form onSubmit={handleSubmit} className="space-y-5 bg-card rounded-3xl p-6 border border-border shadow-xs">
           {/* Photo Preview & Selection */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-foreground uppercase tracking-wider block">
               Dish Photo
             </label>
-            <div className="relative h-64 w-full rounded-2xl overflow-hidden bg-[#FAF7F2] border border-[#EAE4D7]">
+            <div className="relative h-64 w-full rounded-2xl overflow-hidden bg-card-warm border border-border">
               <Image
                 src={customImageUrl.trim() || selectedImage}
                 alt="Dish preview"
@@ -112,7 +112,7 @@ export default function PostPage() {
             </div>
 
             {/* Quick Photo Switcher */}
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2 pt-1 overflow-x-auto hide-scrollbar">
               {SAMPLE_POST_PHOTOS.map((photo, i) => (
                 <button
                   key={i}
@@ -121,7 +121,7 @@ export default function PostPage() {
                     setSelectedImage(photo);
                     setCustomImageUrl("");
                   }}
-                  className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${
+                  className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
                     selectedImage === photo && !customImageUrl ? "border-primary scale-105 shadow-xs" : "border-transparent opacity-70"
                   }`}
                 >
@@ -135,7 +135,7 @@ export default function PostPage() {
               placeholder="Or paste custom image URL..."
               value={customImageUrl}
               onChange={(e) => setCustomImageUrl(e.target.value)}
-              className="w-full px-3 py-2 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-3 py-2 bg-card-warm border border-border rounded-xl text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
 
@@ -147,7 +147,7 @@ export default function PostPage() {
             <select
               value={selectedRecipeId}
               onChange={(e) => setSelectedRecipeId(e.target.value)}
-              className="w-full px-4 py-3 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-4 py-3 bg-card-warm border border-border rounded-xl text-foreground text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
               <option value="">-- None / Custom Dish --</option>
               {recipes.map((recipe) => (
@@ -166,7 +166,7 @@ export default function PostPage() {
             <textarea
               rows={3}
               required
-              className="w-full p-4 bg-[#FAF7F2] border border-[#EAE4D7] rounded-2xl text-foreground placeholder:text-muted-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+              className="w-full p-4 bg-card-warm border border-border rounded-2xl text-foreground placeholder:text-muted-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               placeholder="Tell everyone how it tasted, what tweaks you made, or who you cooked for..."
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
@@ -174,7 +174,7 @@ export default function PostPage() {
           </div>
 
           {/* Location Tag */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-[#FAF7F2] p-3 rounded-xl border border-[#EAE4D7]/80">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-card-warm p-3 rounded-xl border border-border">
             <MapPin className="w-4 h-4 text-primary" />
             <span>Posting from: <strong>{location}</strong></span>
           </div>
@@ -200,7 +200,7 @@ export default function PostPage() {
         </form>
       ) : (
         /* Success Screen */
-        <div className="bg-white rounded-3xl p-8 border border-[#EAE4D7] text-center shadow-xs space-y-6 animate-in zoom-in-95 duration-200">
+        <div className="bg-card rounded-3xl p-8 border border-border text-center shadow-xs space-y-6 animate-in zoom-in-95 duration-200">
           <div className="w-16 h-16 rounded-full bg-sage-light text-primary mx-auto flex items-center justify-center shadow-2xs">
             <Check className="w-8 h-8 stroke-[3]" />
           </div>
@@ -235,7 +235,7 @@ export default function PostPage() {
                 setIsPosted(false);
                 setCaption("");
               }}
-              className="flex-1 bg-[#FAF7F2] hover:bg-muted text-foreground font-semibold py-3 rounded-xl text-xs transition-colors border border-border"
+              className="flex-1 bg-card-warm hover:bg-muted text-foreground font-semibold py-3 rounded-xl text-xs transition-colors border border-border"
             >
               Share Another
             </button>

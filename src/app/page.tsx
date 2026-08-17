@@ -74,9 +74,9 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EAE4D7] shadow-xs food-card-hover flex flex-col md:flex-row items-center gap-6">
+          <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs food-card-hover flex flex-col md:flex-row items-center gap-6">
             {/* Left/Top: Large Food Image */}
-            <div className="relative w-full md:w-1/2 h-56 sm:h-64 rounded-2xl overflow-hidden bg-[#FAF7F2] flex-shrink-0 shadow-2xs">
+            <div className="relative w-full md:w-1/2 h-56 sm:h-64 rounded-2xl overflow-hidden bg-card-warm flex-shrink-0 shadow-2xs">
               <Image
                 src={featuredRecipe.image_url || "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80"}
                 alt={featuredRecipe.title}
@@ -84,7 +84,7 @@ export default async function Home() {
                 className="object-cover"
                 priority
               />
-              <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-primary font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs">
+              <div className="absolute top-3 left-3 bg-card/95 backdrop-blur-md text-primary font-extrabold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs border border-border/50">
                 ⭐ NIGERIAN CLASSIC
               </div>
             </div>
@@ -108,7 +108,7 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-[#F0ECE3] flex flex-wrap items-center justify-between gap-3">
+              <div className="pt-3 border-t border-border-light flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-4 text-xs font-semibold text-foreground/80">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-primary" />
@@ -169,7 +169,7 @@ export default async function Home() {
             <Link
               key={region.id}
               href={region.id === "all" ? "/search" : `/search?cuisine=${region.id}`}
-              className="bg-white hover:bg-sage-light border border-[#EAE4D7] hover:border-primary/40 rounded-2xl p-3 text-center transition-all shadow-2xs food-card-hover group flex flex-col items-center justify-center gap-1.5"
+              className="bg-card hover:bg-sage-light border border-border hover:border-primary/40 rounded-2xl p-3 text-center transition-all shadow-2xs food-card-hover group flex flex-col items-center justify-center gap-1.5"
             >
               <span className="text-xl group-hover:scale-110 transition-transform">
                 {region.icon}

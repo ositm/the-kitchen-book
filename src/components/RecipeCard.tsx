@@ -61,7 +61,7 @@ export default function RecipeCard({
   if (matchScore !== undefined) {
     if (matchScore >= 80) badgeColor = "bg-[#2E8B57] text-white";
     else if (matchScore >= 50) badgeColor = "bg-[#F59E0B] text-white";
-    else badgeColor = "bg-[#6B7280] text-white";
+    else badgeColor = "bg-muted text-muted-foreground";
   }
 
   const cuisineLabel = cuisine?.toLowerCase() === "nigerian" && region 
@@ -69,9 +69,9 @@ export default function RecipeCard({
     : cuisine || "Nigerian";
 
   return (
-    <div className="group relative flex flex-col bg-white rounded-2xl overflow-hidden border border-[#EAE4D7] shadow-2xs food-card-hover transition-all">
+    <div className="group relative flex flex-col bg-card rounded-2xl overflow-hidden border border-border shadow-2xs food-card-hover transition-all">
       {/* Top Image Container */}
-      <Link href={`/recipe/${slug}`} className="relative h-44 sm:h-48 w-full bg-[#FAF7F2] overflow-hidden block">
+      <Link href={`/recipe/${slug}`} className="relative h-44 sm:h-48 w-full bg-card-warm overflow-hidden block">
         <Image
           src={image_url || "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&q=80"}
           alt={title}
@@ -80,7 +80,7 @@ export default function RecipeCard({
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/15" />
 
         {/* Top Badges: Match Score & Rating */}
         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
@@ -90,13 +90,13 @@ export default function RecipeCard({
               <span>{matchScore}% MATCH</span>
             </div>
           ) : (
-            <div className="bg-white/95 backdrop-blur-md text-foreground px-2.5 py-0.5 rounded-full text-[11px] font-bold shadow-2xs">
+            <div className="bg-card/95 backdrop-blur-md text-foreground px-2.5 py-0.5 rounded-full text-[11px] font-bold shadow-2xs border border-border/50">
               <span className="capitalize">{cuisineLabel}</span>
             </div>
           )}
 
           {/* Rating */}
-          <div className="bg-white/95 backdrop-blur-md text-foreground px-2 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1 shadow-2xs">
+          <div className="bg-card/95 backdrop-blur-md text-foreground px-2 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1 shadow-2xs border border-border/50">
             <Star className="w-3 h-3 text-[#F59E0B] fill-[#F59E0B]" />
             <span>{rating.toFixed(1)}</span>
           </div>
@@ -104,7 +104,7 @@ export default function RecipeCard({
 
         {/* Bottom overlay: Cook time & Price */}
         <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-white text-xs font-semibold drop-shadow-md pointer-events-none">
-          <div className="flex items-center gap-1 bg-black/40 backdrop-blur-xs px-2 py-0.5 rounded-lg">
+          <div className="flex items-center gap-1 bg-black/50 backdrop-blur-xs px-2 py-0.5 rounded-lg border border-white/10">
             <Clock className="w-3 h-3 text-amber-300" />
             <span>{cook_time_mins} mins</span>
           </div>
@@ -115,7 +115,7 @@ export default function RecipeCard({
       </Link>
 
       {/* Card Body */}
-      <div className="p-4 flex flex-col flex-1 justify-between gap-3">
+      <div className="p-4 flex flex-col flex-1 justify-between gap-3 bg-card">
         <div>
           <div className="flex items-start justify-between gap-2">
             <Link href={`/recipe/${slug}`} className="hover:text-primary transition-colors flex-1">
@@ -146,8 +146,8 @@ export default function RecipeCard({
         </div>
 
         {/* Footer info & CTA */}
-        <div className="pt-2 border-t border-[#F0ECE3] flex items-center justify-between text-xs">
-          <span className="capitalize bg-[#FAF7F2] px-2 py-0.5 rounded-md text-muted-foreground font-medium text-[11px] border border-border/50">
+        <div className="pt-2 border-t border-border-light flex items-center justify-between text-xs">
+          <span className="capitalize bg-card-warm px-2 py-0.5 rounded-md text-muted-foreground font-medium text-[11px] border border-border/50">
             {cuisineLabel}
           </span>
 

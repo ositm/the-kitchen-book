@@ -57,7 +57,7 @@ export default function PantryPage() {
         {count > 0 && (
           <button
             onClick={clear}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-error font-semibold px-3 py-1.5 rounded-xl border border-border hover:border-error/30 transition-colors"
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-error font-semibold px-3 py-1.5 rounded-xl border border-border hover:border-error/30 transition-colors bg-card"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Clear all</span>
@@ -66,7 +66,7 @@ export default function PantryPage() {
       </div>
 
       {/* 1. CURRENT PANTRY ITEMS (Chips container) */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EAE4D7] shadow-xs space-y-3">
+      <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-xs sm:text-sm font-bold text-foreground uppercase tracking-wider">
             Ingredients in Your Kitchen ({items.length})
@@ -75,7 +75,7 @@ export default function PantryPage() {
         </div>
 
         {items.length === 0 ? (
-          <div className="text-center py-6 border-2 border-dashed border-border/80 rounded-2xl p-4 bg-[#FAF7F2]">
+          <div className="text-center py-6 border-2 border-dashed border-border/80 rounded-2xl p-4 bg-card-warm">
             <ChefHat className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
             <p className="text-xs font-semibold text-foreground">Your pantry is currently empty</p>
             <p className="text-[11px] text-muted-foreground mt-0.5">
@@ -105,7 +105,7 @@ export default function PantryPage() {
 
         {/* Action Button: Find Recipes */}
         {count > 0 && (
-          <div className="pt-3 border-t border-[#F0ECE3]">
+          <div className="pt-3 border-t border-border-light">
             <Link
               href="/search"
               className="w-full bg-primary hover:bg-primary-dark active:scale-98 text-white font-bold py-3.5 px-4 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-xs sm:text-sm"
@@ -119,7 +119,7 @@ export default function PantryPage() {
       </div>
 
       {/* 2. INGREDIENT CATALOG (Search & Categories) */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EAE4D7] shadow-xs space-y-4">
+      <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
         <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
           Quick-Add Ingredients to Pantry
         </h2>
@@ -131,7 +131,7 @@ export default function PantryPage() {
           </div>
           <input
             type="text"
-            className="w-full pl-10 pr-20 py-3 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-muted-foreground"
+            className="w-full pl-10 pr-20 py-3 bg-card-warm border border-border rounded-xl text-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-muted-foreground"
             placeholder="Search by ingredient name (e.g. atarodo, ugwu, iru)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -156,7 +156,7 @@ export default function PantryPage() {
               className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
                 activeCategory === cat.id
                   ? "bg-primary text-white border-primary shadow-2xs"
-                  : "bg-[#FAF7F2] text-foreground/80 border-[#EAE4D7] hover:border-primary/40 hover:bg-white"
+                  : "bg-card-warm text-foreground/80 border-border hover:border-primary/40 hover:bg-card"
               }`}
             >
               {cat.label}
@@ -176,7 +176,7 @@ export default function PantryPage() {
                 className={`flex items-center justify-between p-3 rounded-2xl border text-left transition-all food-card-hover ${
                   inPantry
                     ? "bg-sage-light/60 border-sage-border text-primary font-bold shadow-2xs"
-                    : "bg-[#FAF7F2] border-[#EAE4D7] text-foreground/85 hover:border-primary/40 hover:bg-white"
+                    : "bg-card-warm border-border text-foreground/85 hover:border-primary/40 hover:bg-card"
                 }`}
               >
                 <div className="flex items-center gap-2 min-w-0">

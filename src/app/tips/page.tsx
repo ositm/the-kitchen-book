@@ -80,7 +80,7 @@ export default function TipsPage() {
         </div>
         <input
           type="text"
-          className="w-full pl-11 pr-4 py-3.5 bg-white border border-[#EAE4D7] rounded-2xl text-foreground placeholder:text-muted-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-2xs"
+          className="w-full pl-11 pr-4 py-3.5 bg-card border border-border rounded-2xl text-foreground placeholder:text-muted-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all shadow-2xs"
           placeholder="Search tips (e.g. beans, weevils, power cuts, tomatoes)..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -96,7 +96,7 @@ export default function TipsPage() {
             className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
               selectedCategory === cat.id
                 ? "bg-primary text-white border-primary shadow-2xs"
-                : "bg-white text-foreground/80 border-[#EAE4D7] hover:border-primary/40 hover:bg-sage-light"
+                : "bg-card text-foreground/80 border-border hover:border-primary/40 hover:bg-sage-light"
             }`}
           >
             {cat.label}
@@ -111,7 +111,7 @@ export default function TipsPage() {
           <p className="text-sm font-semibold text-foreground">Loading kitchen tips from database...</p>
         </div>
       ) : filteredTips.length === 0 ? (
-        <div className="bg-white p-10 rounded-3xl border border-[#EAE4D7] text-center text-muted-foreground space-y-2 shadow-xs">
+        <div className="bg-card p-10 rounded-3xl border border-border text-center text-muted-foreground space-y-2 shadow-xs">
           <Lightbulb className="w-8 h-8 text-muted-foreground/40 mx-auto" />
           <p className="text-sm font-semibold text-foreground">No tips found for "{searchQuery}"</p>
           <p className="text-xs">Try searching for something else or reset the category filter.</p>
@@ -121,7 +121,7 @@ export default function TipsPage() {
           {filteredTips.map((tip) => (
             <div
               key={tip.id}
-              className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EAE4D7] hover:border-primary/40 transition-all shadow-2xs food-card-hover flex flex-col justify-between group"
+              className="bg-card rounded-3xl p-5 sm:p-6 border border-border hover:border-primary/40 transition-all shadow-2xs food-card-hover flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -143,7 +143,7 @@ export default function TipsPage() {
               </div>
 
               {/* Footer Action */}
-              <div className="pt-4 mt-4 border-t border-[#F0ECE3] flex items-center justify-between">
+              <div className="pt-4 mt-4 border-t border-border-light flex items-center justify-between">
                 <span className="text-[11px] text-primary font-medium">
                   💡 Kitchen Wisdom
                 </span>

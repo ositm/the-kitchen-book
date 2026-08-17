@@ -28,7 +28,7 @@ export default function TipCard() {
   }, []);
 
   return (
-    <div className="bg-white border border-[#EAE4D7] rounded-3xl p-5 sm:p-6 shadow-2xs food-card-hover flex flex-col justify-between relative overflow-hidden">
+    <div className="bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-2xs food-card-hover flex flex-col justify-between relative overflow-hidden">
       <div>
         {/* Top Header Tag */}
         <div className="flex items-center justify-between mb-2.5">
@@ -38,7 +38,7 @@ export default function TipCard() {
             </span>
             <span>Today's Kitchen Tip</span>
           </span>
-          <span className="text-[11px] font-semibold text-muted-foreground bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-border/60">
+          <span className="text-[11px] font-semibold text-muted-foreground bg-card-warm px-2.5 py-0.5 rounded-full border border-border/60">
             {tip.category}
           </span>
         </div>
@@ -53,7 +53,7 @@ export default function TipCard() {
       </div>
 
       {/* Footer Link */}
-      <div className="pt-3 mt-3 border-t border-[#F0ECE3] flex items-center justify-between">
+      <div className="pt-3 mt-3 border-t border-border-light flex items-center justify-between">
         <span className="text-[11px] font-medium text-primary">
           💡 Verified Nigerian Kitchen Secret
         </span>

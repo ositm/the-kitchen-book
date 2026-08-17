@@ -5,25 +5,71 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePantry } from "@/lib/pantryStore";
 import { calculateRecipeMatch } from "@/lib/matchingEngine";
-import LazyVideo from "@/components/LazyVideo";
 import MissingIngredientsModal from "@/components/MissingIngredientsModal";
 import StepByStepCookModal from "@/components/StepByStepCookModal";
 import {
   Clock,
   Users,
-  Banknote,
-  ShoppingCart,
+  Star,
+  Flame,
   CheckCircle2,
   AlertCircle,
   Play,
   Share2,
   Heart,
-  ChevronRight,
-  Flame,
-  Star,
-  BookOpen,
-  ArrowLeft
+  ShoppingCart,
+  ChevronLeft,
+  Sparkles,
+  BookOpen
 } from "lucide-react";
+
+// Lazy loaded YouTube video player
+function LazyVideo({ videoUrl, title }: { videoUrl: string; title: string }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const getYoutubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const videoId = getYoutubeId(videoUrl);
+
+  if (!videoId) return null;
+
+  if (!isLoaded) {
+    return (
+      <button
+        onClick={() => setIsLoaded(true)}
+        className="relative w-full aspect-video rounded-2xl overflow-hidden bg-card-warm group flex items-center justify-center border border-border"
+        aria-label={`Play video for ${title}`}
+      >
+        <Image
+          src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+          alt={title}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
+        <div className="relative w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+          <Play className="w-6 h-6 fill-white ml-0.5" />
+        </div>
+      </button>
+    );
+  }
+
+  return (
+    <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-border shadow-xs">
+      <iframe
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+        title={title}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="w-full h-full"
+      />
+    </div>
+  );
+}
 
 interface RecipeDetailClientProps {
   recipe: any;
@@ -37,56 +83,52 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
 
   const { items: pantryItems } = usePantry();
 
-  // Compute live Have vs. Missing split based on client pantry state
-  const matchResult = calculateRecipeMatch(
-    recipe.recipe_ingredients || [],
-    pantryItems
-  );
-
+  // Match calculations
+  const matchResult = calculateRecipeMatch(recipe.recipe_ingredients || [], pantryItems);
+  const matchScore = matchResult.matchScore;
   const haveIngredients = matchResult.haveIngredients;
   const missingIngredients = matchResult.missingIngredients;
-  const matchScore = matchResult.matchScore;
 
-  // Estimated Naira Cost
-  const costEstimate = recipe.cost_level === 1 ? "₦1,800" : recipe.cost_level === 2 ? "₦3,500" : "₦8,200";
+  // Cost estimates
+  const costEstimate =
+    recipe.cost_level === 1 ? "₦1,800 - ₦2,500" : recipe.cost_level === 2 ? "₦3,500 - ₦5,000" : "₦8,000+";
 
-  // Share recipe handler
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
         title: recipe.title,
-        text: `Check out this recipe for ${recipe.title} on The Kitchen Book!`,
-        url: window.location.href
+        text: `Check out how to cook ${recipe.title} on The Kitchen Book!`,
+        url: window.location.href,
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Recipe link copied to clipboard!");
+      const shareUrl = `https://wa.me/?text=${encodeURIComponent(`🍳 Check out how to cook ${recipe.title} on The Kitchen Book: ${window.location.href}`)}`;
+      window.open(shareUrl, "_blank");
     }
   };
 
   return (
-    <div className="flex flex-col w-full pb-28 -mt-4 sm:-mt-6">
-      {/* 1. HERO PHOTO BANNER */}
-      <div className="relative w-full h-72 sm:h-96 -mx-4 sm:-mx-6 max-w-none bg-[#FAF7F2] overflow-hidden">
+    <div className="flex flex-col pb-24 max-w-3xl mx-auto">
+      {/* 1. HERO IMAGE BANNER (Magazine Full-bleed header) */}
+      <div className="relative w-full h-72 sm:h-96 rounded-3xl overflow-hidden bg-card-warm shadow-md border border-border">
         <Image
           src={recipe.image_url || "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=1200&q=80"}
           alt={recipe.title}
           fill
           priority
           className="object-cover"
-          sizes="100vw"
         />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex flex-col justify-between p-4 sm:p-6 md:p-8">
-          {/* Top Actions: Back, Share, Favorite */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/20" />
+
+        {/* Top Floating Controls */}
+        <div className="absolute inset-0 p-4 sm:p-6 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <Link
               href="/"
-              className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/60 transition-colors"
-              aria-label="Back to home"
+              className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/60 transition-colors shadow-sm"
+              aria-label="Go back"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ChevronLeft className="w-5 h-5" />
             </Link>
 
             <div className="flex items-center gap-2">
@@ -97,6 +139,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
               >
                 <Share2 className="w-4 h-4" />
               </button>
+
               <button
                 onClick={() => setIsFavorite(!isFavorite)}
                 className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/60 transition-colors"
@@ -127,7 +170,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
       </div>
 
       {/* 2. STATS & METADATA BAR */}
-      <div className="bg-white border border-[#EAE4D7] rounded-3xl p-4 sm:p-5 mt-4 shadow-2xs flex items-center justify-around text-center">
+      <div className="bg-card border border-border rounded-3xl p-4 sm:p-5 mt-4 shadow-2xs flex items-center justify-around text-center">
         <div>
           <span className="text-[11px] font-bold text-muted-foreground uppercase block mb-1">
             Cook Time
@@ -186,7 +229,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
       </div>
 
       {/* 4. TABS: Overview | Ingredients | Steps | Video */}
-      <div className="flex items-center gap-2 border-b border-[#EAE4D7] mt-6 pb-2 overflow-x-auto hide-scrollbar">
+      <div className="flex items-center gap-2 border-b border-border mt-6 pb-2 overflow-x-auto hide-scrollbar">
         {[
           { id: "overview", label: "Overview" },
           { id: "ingredients", label: `Ingredients (${haveIngredients.length}/${recipe.recipe_ingredients?.length || 0})` },
@@ -199,7 +242,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
             className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
               activeTab === tab.id
                 ? "bg-primary text-white shadow-2xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-white"
+                : "text-muted-foreground hover:text-foreground hover:bg-card"
             }`}
           >
             {tab.label}
@@ -213,7 +256,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
         {activeTab === "overview" && (
           <div className="space-y-6">
             {recipe.description && (
-              <div className="bg-white rounded-3xl p-6 border border-[#EAE4D7] shadow-2xs">
+              <div className="bg-card rounded-3xl p-6 border border-border shadow-2xs">
                 <h3 className="text-xs font-extrabold text-muted-foreground uppercase tracking-wider mb-2">
                   About this Dish
                 </h3>
@@ -277,8 +320,8 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
 
         {/* TAB 2: FULL INGREDIENTS LIST */}
         {activeTab === "ingredients" && (
-          <div className="bg-white rounded-3xl p-6 border border-[#EAE4D7] shadow-2xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#F0ECE3]">
+          <div className="bg-card rounded-3xl p-6 border border-border shadow-2xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-border-light">
               <div>
                 <h3 className="font-bold text-base text-foreground">Recipe Ingredients</h3>
                 <p className="text-xs text-muted-foreground">
@@ -308,7 +351,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                     className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
                       isHave
                         ? "bg-sage-light/40 border-sage-border/60 text-foreground"
-                        : "bg-[#FAF7F2] border-[#EAE4D7] text-foreground/85"
+                        : "bg-card-warm border-border text-foreground/85"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -348,8 +391,8 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
 
         {/* TAB 3: STEP-BY-STEP INSTRUCTIONS */}
         {activeTab === "steps" && (
-          <div className="bg-white rounded-3xl p-6 border border-[#EAE4D7] shadow-2xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#F0ECE3]">
+          <div className="bg-card rounded-3xl p-6 border border-border shadow-2xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-border-light">
               <div>
                 <h3 className="font-bold text-base text-foreground">Cooking Method</h3>
                 <p className="text-xs text-muted-foreground">
@@ -370,7 +413,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
               {(recipe.steps || []).map((stepText: string, idx: number) => (
                 <div
                   key={idx}
-                  className="flex items-start gap-4 p-4 rounded-2xl bg-[#FAF7F2] border border-[#EAE4D7]"
+                  className="flex items-start gap-4 p-4 rounded-2xl bg-card-warm border border-border"
                 >
                   <div className="w-8 h-8 rounded-xl bg-primary text-white font-extrabold text-xs flex items-center justify-center flex-shrink-0 mt-0.5 shadow-2xs">
                     {idx + 1}
@@ -386,7 +429,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
 
         {/* TAB 4: VIDEO MASTERCLASS */}
         {activeTab === "video" && (
-          <div className="bg-white rounded-3xl p-6 border border-[#EAE4D7] shadow-2xs space-y-4">
+          <div className="bg-card rounded-3xl p-6 border border-border shadow-2xs space-y-4">
             <div>
               <h3 className="font-bold text-base text-foreground">Video Masterclass</h3>
               <p className="text-xs text-muted-foreground">
@@ -399,7 +442,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
                 <LazyVideo videoUrl={recipe.video_url} title={recipe.title} />
               </div>
             ) : (
-              <div className="p-8 text-center bg-[#FAF7F2] rounded-2xl border border-border text-muted-foreground space-y-2">
+              <div className="p-8 text-center bg-card-warm rounded-2xl border border-border text-muted-foreground space-y-2">
                 <p className="text-sm font-semibold text-foreground">No video attached yet for this recipe.</p>
                 <p className="text-xs">Follow the step-by-step text guide above.</p>
               </div>

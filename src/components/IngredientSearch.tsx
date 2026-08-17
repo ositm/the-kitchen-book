@@ -61,7 +61,7 @@ export default function IngredientSearch({ onFindRecipes, showFindButton = true 
   };
 
   return (
-    <div className="w-full bg-white rounded-3xl p-5 sm:p-7 border border-[#EAE4D7] shadow-xs">
+    <div className="w-full bg-card rounded-3xl p-5 sm:p-7 border border-border shadow-xs">
       {/* Search Input Box */}
       <form onSubmit={handleAddFromInput} className="relative mb-4">
         <label className="text-xs font-bold text-foreground/80 uppercase tracking-wider block mb-2">
@@ -73,7 +73,7 @@ export default function IngredientSearch({ onFindRecipes, showFindButton = true 
           </div>
           <input
             type="text"
-            className="w-full pl-11 pr-24 py-3.5 bg-[#FAF7F2] hover:bg-white focus:bg-white border border-[#EAE4D7] rounded-2xl text-foreground placeholder:text-muted-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+            className="w-full pl-11 pr-24 py-3.5 bg-card-warm hover:bg-card focus:bg-card border border-border rounded-2xl text-foreground placeholder:text-muted-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
             placeholder="Type an ingredient (e.g. Rice, Palm oil, Ugu, Egusi)..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -95,7 +95,7 @@ export default function IngredientSearch({ onFindRecipes, showFindButton = true 
 
         {/* Dropdown Suggestions */}
         {suggestions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border rounded-2xl shadow-lg z-30 overflow-hidden py-1">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl shadow-lg z-30 overflow-hidden py-1">
             {suggestions.map((sug) => {
               const inPantry = has(sug.name);
               return (
@@ -168,7 +168,7 @@ export default function IngredientSearch({ onFindRecipes, showFindButton = true 
         )}
 
         {/* Quick Staple Selector Pills */}
-        <div className="pt-2 border-t border-[#F0ECE3]">
+        <div className="pt-2 border-t border-border-light">
           <span className="text-[11px] font-bold text-muted-foreground block mb-2">
             Quick Add Popular Staples:
           </span>
@@ -183,7 +183,7 @@ export default function IngredientSearch({ onFindRecipes, showFindButton = true 
                   className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-medium border transition-all ${
                     inPantry
                       ? "bg-primary text-white border-primary shadow-2xs"
-                      : "bg-[#FAF7F2] text-foreground/80 border-[#EAE4D7] hover:border-primary/40 hover:bg-white"
+                      : "bg-card-warm text-foreground/80 border-border hover:border-primary/40 hover:bg-card"
                   }`}
                 >
                   <span>{staple.icon}</span>

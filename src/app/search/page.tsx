@@ -135,7 +135,7 @@ function SearchContent() {
         </div>
         <input
           type="text"
-          className="w-full pl-11 pr-10 py-3.5 bg-white border border-[#EAE4D7] rounded-2xl shadow-2xs focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-foreground text-sm md:text-base font-medium placeholder:text-muted-foreground transition-all"
+          className="w-full pl-11 pr-10 py-3.5 bg-card border border-border rounded-2xl shadow-2xs focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-foreground text-sm md:text-base font-medium placeholder:text-muted-foreground transition-all"
           placeholder="Search by recipe name, soup, stew, rice..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -156,7 +156,7 @@ function SearchContent() {
             className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
               selectedFilter === tab.id
                 ? "bg-primary text-white border-primary shadow-2xs"
-                : "bg-white text-foreground/80 border-[#EAE4D7] hover:border-primary/40 hover:bg-sage-light"
+                : "bg-card text-foreground/80 border-border hover:border-primary/40 hover:bg-sage-light"
             }`}
           >
             {tab.label}

@@ -47,7 +47,7 @@ export default function MoodRail({ selectedMood, onSelectMood }: MoodRailProps) 
               className={`flex-shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-semibold border transition-all ${
                 isSelected
                   ? "bg-primary text-white border-primary shadow-xs"
-                  : "bg-white text-foreground/85 border-[#EAE4D7] hover:border-primary/40 hover:bg-sage-light/50"
+                  : "bg-card text-foreground/85 border-border hover:border-primary/40 hover:bg-sage-light/50"
               }`}
             >
               <span className="text-base">{mood.icon}</span>

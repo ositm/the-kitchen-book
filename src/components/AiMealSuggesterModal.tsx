@@ -100,31 +100,72 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "") + `-${Date.now().toString().slice(-4)}`;
 
-      const { data, error } = await supabase
+      // 1. Insert recipe into Supabase `recipes` table
+      const { data: recipeData, error: recipeError } = await supabase
         .from("recipes")
         .insert({
           title: dish.title,
           slug,
-          description: dish.description,
-          cuisine: dish.cuisine.toLowerCase().includes("yoruba") ? "yoruba" : dish.cuisine.toLowerCase().includes("igbo") ? "igbo" : "nigerian",
-          meal_type: dish.title.toLowerCase().includes("soup") ? "soup" : "dinner",
+          description: `${dish.description} (Suggested by Chef Oracle AI)`,
+          cuisine: dish.cuisine.toLowerCase(),
+          meal_type: dish.cuisine.includes("Soup") ? "soup" : "dinner",
           cook_time_mins: parseInt(dish.cookTime) || 30,
-          cost_level: 1,
-          servings: 2,
-          steps: dish.steps,
+          servings: 4,
+          cost_level: 2,
           image_url: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80",
-          mood_tags: ["ai_suggested", "comfort"],
-          source: "ai_oracle",
           is_published: true
         })
-        .select("slug")
+        .select("id, slug")
         .single();
 
-      if (!error && data) {
-        setSavedRecipes((prev) => ({ ...prev, [dish.id]: data.slug }));
+      if (recipeError) throw new Error(recipeError.message);
+
+      // 2. Insert ingredients
+      const allIngredients = [...dish.haveIngredients, ...dish.missingIngredients];
+      for (const ingName of allIngredients) {
+        const cleanName = ingName.trim().toLowerCase();
+        if (!cleanName) continue;
+
+        // Check if ingredient exists
+        let { data: existingIng } = await supabase
+          .from("ingredients")
+          .select("id")
+          .eq("name", cleanName)
+          .maybeSingle();
+
+        let ingId = existingIng?.id;
+        if (!ingId) {
+          const { data: newIng } = await supabase
+            .from("ingredients")
+            .insert({ name: cleanName, category: "other" })
+            .select("id")
+            .single();
+          if (newIng) ingId = newIng.id;
+        }
+
+        if (ingId) {
+          await supabase.from("recipe_ingredients").insert({
+            recipe_id: recipeData.id,
+            ingredient_id: ingId,
+            quantity: "To taste",
+            unit: "",
+            is_core: dish.haveIngredients.includes(ingName)
+          });
+        }
       }
+
+      // 3. Insert steps
+      const stepsPayload = dish.steps.map((st, i) => ({
+        recipe_id: recipeData.id,
+        step_number: i + 1,
+        instruction: st
+      }));
+      await supabase.from("recipe_steps").insert(stepsPayload);
+
+      setSavedRecipes((prev) => ({ ...prev, [dish.id]: recipeData.slug }));
     } catch (err) {
-      console.error("Failed to save AI recipe:", err);
+      console.error("Failed to save AI recipe to Supabase:", err);
+      alert("Failed to save recipe. Please try again.");
     } finally {
       setSavingRecipeId(null);
     }
@@ -135,9 +176,9 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-200">
-        <div className="bg-[#FFF9ED] w-full max-w-2xl rounded-t-3xl sm:rounded-3xl border border-[#EAE4D7] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom duration-200">
+        <div className="bg-background w-full max-w-2xl rounded-t-3xl sm:rounded-3xl border border-border shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom duration-200">
           {/* Header */}
-          <div className="p-5 bg-white border-b border-[#EAE4D7] flex items-center justify-between">
+          <div className="p-5 bg-card border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-accent text-white flex items-center justify-center shadow-xs">
                 <Sparkles className="w-5 h-5" />
@@ -164,7 +205,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
           {/* Modal Body */}
           <div className="p-5 overflow-y-auto flex-1 space-y-5">
             {/* Pantry Ingredients Preview */}
-            <div className="bg-white rounded-2xl p-4 border border-[#EAE4D7] space-y-2">
+            <div className="bg-card rounded-2xl p-4 border border-border space-y-2">
               <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
                 Ingredients In Your Pantry ({pantryItems.length}):
               </span>
@@ -203,7 +244,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                       selectedMood === qp.id
                         ? "bg-primary text-white border-primary shadow-2xs"
-                        : "bg-white text-foreground border-[#EAE4D7] hover:border-primary/40 hover:bg-sage-light"
+                        : "bg-card text-foreground border-border hover:border-primary/40 hover:bg-sage-light"
                     }`}
                   >
                     {qp.label}
@@ -216,7 +257,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
             <div className="relative flex items-center">
               <input
                 type="text"
-                className="w-full pl-4 pr-24 py-3 bg-white border border-[#EAE4D7] rounded-xl text-xs sm:text-sm text-foreground placeholder:text-muted-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full pl-4 pr-24 py-3 bg-card border border-border rounded-xl text-xs sm:text-sm text-foreground placeholder:text-muted-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
                 placeholder="Ask Chef Oracle (e.g. 'Dinner for 2 with no oil', 'Use my boiled rice')..."
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -236,7 +277,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
 
             {/* AI Suggestions Results List */}
             {loading ? (
-              <div className="py-12 text-center bg-white rounded-3xl border border-[#EAE4D7] space-y-3">
+              <div className="py-12 text-center bg-card rounded-3xl border border-border space-y-3">
                 <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
                 <p className="font-bold text-sm text-foreground font-serif">
                   Chef Oracle is creating your meals...
@@ -258,7 +299,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
                   return (
                     <div
                       key={dish.id}
-                      className="bg-white rounded-3xl p-5 border border-[#EAE4D7] shadow-xs space-y-4 food-card-hover"
+                      className="bg-card rounded-3xl p-5 border border-border shadow-xs space-y-4 food-card-hover"
                     >
                       {/* Header */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -302,7 +343,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
                             <button
                               onClick={() => handleSaveToCookbook(dish)}
                               disabled={isSaving}
-                              className="text-xs font-bold px-3 py-1.5 rounded-xl bg-[#FAF7F2] text-foreground border border-border hover:bg-sage-light hover:border-primary/40 transition-all flex items-center gap-1"
+                              className="text-xs font-bold px-3 py-1.5 rounded-xl bg-card-warm text-foreground border border-border hover:bg-sage-light hover:border-primary/40 transition-all flex items-center gap-1"
                             >
                               {isSaving ? (
                                 <>
@@ -332,7 +373,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
 
                       {/* Ingredients Breakdown */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        <div className="bg-[#FAF7F2] p-3 rounded-xl border border-border/60">
+                        <div className="bg-card-warm p-3 rounded-xl border border-border/60">
                           <span className="font-bold text-primary block mb-1">
                             ✓ You have ({dish.haveIngredients.length}):
                           </span>
@@ -340,7 +381,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
                             {dish.haveIngredients.join(", ") || "All basic items"}
                           </span>
                         </div>
-                        <div className="bg-[#FAF7F2] p-3 rounded-xl border border-border/60">
+                        <div className="bg-card-warm p-3 rounded-xl border border-border/60">
                           <span className="font-bold text-accent block mb-1">
                             + Optional / missing:
                           </span>
@@ -351,7 +392,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
                       </div>
 
                       {/* Steps */}
-                      <div className="space-y-2 pt-2 border-t border-[#F0ECE3]">
+                      <div className="space-y-2 pt-2 border-t border-border-light">
                         <span className="text-xs font-bold text-foreground block">
                           Quick Cooking Steps:
                         </span>
@@ -382,7 +423,7 @@ export default function AiMealSuggesterModal({ isOpen, onClose }: AiMealSuggeste
                 })}
               </div>
             ) : (
-              <div className="p-8 text-center bg-white rounded-3xl border border-[#EAE4D7] space-y-2">
+              <div className="p-8 text-center bg-card rounded-3xl border border-border space-y-2">
                 <ChefHat className="w-10 h-10 text-primary/40 mx-auto" />
                 <h3 className="font-bold text-sm text-foreground">
                   Ready to find what you can cook?

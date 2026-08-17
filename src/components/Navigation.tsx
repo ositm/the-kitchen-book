@@ -17,6 +17,7 @@ import {
   Heart
 } from "lucide-react";
 import { usePantry } from "@/lib/pantryStore";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -43,7 +44,7 @@ export default function Navigation() {
     <>
       {/* QUICK CREATE POPUP MODAL */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="bg-card w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 border border-border shadow-xl space-y-4 animate-in slide-in-from-bottom duration-200">
             <div className="flex items-center justify-between pb-2 border-b border-border/80">
               <h3 className="font-bold text-sm sm:text-base text-foreground">
@@ -99,7 +100,7 @@ export default function Navigation() {
       )}
 
       {/* MOBILE BOTTOM NAVIGATION (Fixed, clean) */}
-      <nav className="fixed bottom-0 left-0 right-0 w-full bg-card/95 backdrop-blur-md border-t border-border/80 pb-safe z-40 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+      <nav className="fixed bottom-0 left-0 right-0 w-full bg-card/95 backdrop-blur-md border-t border-border/80 pb-safe z-40 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
         <div className="flex justify-around items-center h-15 px-2">
           {mobileNavLinks.map(({ href, label, icon: Icon, isAction, badge }) => {
             const isActive = pathname === href;
@@ -109,11 +110,11 @@ export default function Navigation() {
                 <button
                   key={href}
                   onClick={() => setShowCreateModal(true)}
-                  className="flex flex-col items-center -mt-4 group"
+                  className="flex flex-col items-center -mt-5 group"
                   aria-label="Create Recipe or Post"
                 >
-                  <div className="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center shadow-md shadow-primary/20 group-hover:scale-105 active:scale-95 transition-all">
-                    <Plus className="w-5 h-5 stroke-[2.5]" />
+                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-105 active:scale-95 transition-all border-2 border-card">
+                    <Plus className="w-6 h-6 stroke-[2.5]" />
                   </div>
                   <span className="text-[10px] font-semibold text-foreground/80 mt-0.5">
                     Create
@@ -131,7 +132,7 @@ export default function Navigation() {
                 }`}
               >
                 <div className="relative">
-                  <Icon className={`w-4.5 h-4.5 transition-transform ${isActive ? "scale-110 stroke-[2.5]" : ""}`} />
+                  <Icon className={`w-5 h-5 transition-transform ${isActive ? "scale-110 stroke-[2.5]" : ""}`} />
                   {badge !== null && badge !== undefined && (
                     <span className="absolute -top-1 -right-2.5 bg-accent text-white text-[9px] font-extrabold px-1.5 py-0.2 rounded-full ring-2 ring-card shadow-2xs">
                       {badge}
@@ -218,24 +219,31 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* Calm Bottom Pantry Summary */}
-        <div className="bg-[#FAF7F2] border border-border rounded-2xl p-3 text-xs">
-          <div className="flex items-center justify-between mb-1">
-            <span className="font-bold text-primary text-[11px] flex items-center gap-1.5">
-              <ChefHat className="w-3.5 h-3.5" />
-              Pantry Ready
-            </span>
-            <span className="font-bold text-primary text-[11px]">{count} items</span>
+        {/* Bottom Section: Theme Toggle + Pantry Summary */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-2 pt-2 border-t border-border/60">
+            <span className="text-[11px] font-semibold text-muted-foreground">Theme</span>
+            <ThemeToggle showLabel={false} />
           </div>
-          <p className="text-muted-foreground text-[10px] mb-2 leading-relaxed">
-            {count > 0 ? `${count} ingredients available to match recipes.` : "Add what you have at home."}
-          </p>
-          <Link
-            href="/pantry"
-            className="block text-center w-full bg-white hover:bg-primary hover:text-white border border-border text-primary font-bold py-1 px-2 rounded-lg text-[11px] transition-all shadow-2xs"
-          >
-            Manage Pantry
-          </Link>
+
+          <div className="bg-card-warm border border-border rounded-2xl p-3 text-xs">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-primary text-[11px] flex items-center gap-1.5">
+                <ChefHat className="w-3.5 h-3.5" />
+                Pantry Ready
+              </span>
+              <span className="font-bold text-primary text-[11px]">{count} items</span>
+            </div>
+            <p className="text-muted-foreground text-[10px] mb-2 leading-relaxed">
+              {count > 0 ? `${count} ingredients available to match recipes.` : "Add what you have at home."}
+            </p>
+            <Link
+              href="/pantry"
+              className="block text-center w-full bg-card hover:bg-primary hover:text-white border border-border text-primary font-bold py-1 px-2 rounded-lg text-[11px] transition-all shadow-2xs"
+            >
+              Manage Pantry
+            </Link>
+          </div>
         </div>
       </aside>
     </>

@@ -37,11 +37,11 @@ export default function AuthModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-      <div className="bg-[#FFF9ED] w-full max-w-md rounded-3xl border border-[#EAE4D7] shadow-2xl p-6 sm:p-7 relative overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-card w-full max-w-md rounded-3xl border border-border shadow-2xl p-6 sm:p-7 relative overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white border border-[#EAE4D7] flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-card-warm border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -61,7 +61,7 @@ export default function AuthModal({
         </div>
 
         {/* Perks list */}
-        <div className="bg-white rounded-2xl p-4 border border-[#EAE4D7] space-y-2.5 mb-6 text-xs text-foreground/80">
+        <div className="bg-card-warm rounded-2xl p-4 border border-border space-y-2.5 mb-6 text-xs text-foreground/80">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
             <span>Sync your pantry ingredients across phone & laptop</span>
@@ -77,7 +77,7 @@ export default function AuthModal({
         </div>
 
         {errorMsg && (
-          <div className="p-3 bg-red-50 text-error rounded-xl border border-red-200 text-xs font-semibold mb-4 text-center">
+          <div className="p-3 bg-red-500/10 text-error rounded-xl border border-red-500/20 text-xs font-semibold mb-4 text-center">
             {errorMsg}
           </div>
         )}
@@ -86,7 +86,7 @@ export default function AuthModal({
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-white hover:bg-[#FAF7F2] active:scale-98 text-foreground font-bold py-3.5 px-4 rounded-2xl border border-[#D5CEBF] shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-3 text-sm disabled:opacity-50"
+          className="w-full bg-card-warm hover:bg-muted active:scale-98 text-foreground font-bold py-3.5 px-4 rounded-2xl border border-border shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-3 text-sm disabled:opacity-50"
         >
           {loading ? (
             <Loader2 className="w-5 h-5 animate-spin text-primary" />

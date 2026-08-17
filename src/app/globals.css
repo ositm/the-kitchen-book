@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* Warm Culinary Palette */
+  /* Warm Culinary Light Palette */
   --background: #FFF9ED;
   --background-secondary: #F6F3EA;
   --foreground: #1F2937;
@@ -43,6 +43,49 @@
   --error: #DC5A4A;
 }
 
+.dark {
+  /* Rich Obsidian & Emerald Culinary Dark Palette */
+  --background: #111613;
+  --background-secondary: #161D19;
+  --foreground: #F3F4F6;
+  
+  /* Primary Brand: Emerald Green */
+  --primary: #2E8B57;
+  --primary-foreground: #FFFFFF;
+  --primary-dark: #1E6B40;
+  --primary-light: #183124;
+  --primary-subtle: #204231;
+
+  /* Secondary Green: Soft Mint Sage */
+  --sage: #6EE7B7;
+  --sage-light: #162B20;
+  --sage-border: #2B5742;
+
+  /* Warm Food Accent: Warm Amber Orange */
+  --accent: #FF9F5A;
+  --accent-foreground: #111613;
+  --accent-light: #332014;
+  --accent-dark: #FF7E26;
+
+  /* Dark Card Surfaces */
+  --card: #18201B;
+  --card-foreground: #F3F4F6;
+  --card-warm: #1D2621;
+  --card-muted: #141A16;
+
+  /* Neutrals & Borders */
+  --muted: #202A24;
+  --muted-foreground: #9CA3AF;
+  --border: #2B3830;
+  --border-light: #34443B;
+  --ring: #34D399;
+
+  /* Feedback Colors */
+  --success: #34D399;
+  --warning: #FBBF24;
+  --error: #F87171;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-background-secondary: var(--background-secondary);
@@ -81,6 +124,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Custom utility classes */
@@ -98,5 +142,12 @@ body {
 }
 .food-card-hover:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 24px -8px rgba(24, 83, 58, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.12), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
+}
+
+/* Mobile-friendly safe padding */
+@supports (padding: max(0px)) {
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
 }

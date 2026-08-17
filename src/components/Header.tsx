@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import AuthModal from "./AuthModal";
+import ThemeToggle from "./ThemeToggle";
 import { MapPin, Bell, ChevronDown, User, Search, Sparkles, LogOut, ShieldCheck } from "lucide-react";
 
 export const NIGERIAN_CITIES = [
@@ -105,17 +106,19 @@ export default function Header() {
             />
           </form>
 
-          {/* Right: Notifications & Auth Button / Avatar */}
+          {/* Right: Theme Toggle, Notifications & Auth Button / Avatar */}
           <div className="flex items-center gap-2">
+            <ThemeToggle />
+
             <button
               onClick={() => setHasNotification(false)}
-              className="relative p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white transition-colors"
+              className="relative p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-card transition-colors border border-border bg-card"
               title="Notifications"
               aria-label="View notifications"
             >
-              <Bell className="w-4.5 h-4.5" />
+              <Bell className="w-4 h-4" />
               {hasNotification && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full ring-2 ring-[#FFF9ED]" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full ring-2 ring-card" />
               )}
             </button>
 

@@ -80,12 +80,13 @@ export default function CreateRecipePage() {
   };
 
   const removeIngredientRow = (index: number) => {
+    if (ingredients.length <= 1) return;
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
 
   const updateIngredientRow = (index: number, field: string, value: any) => {
     const updated = [...ingredients];
-    updated[index] = { ...updated[index], [field]: value };
+    (updated[index] as any)[field] = value;
     setIngredients(updated);
   };
 
@@ -95,6 +96,7 @@ export default function CreateRecipePage() {
   };
 
   const removeStepRow = (index: number) => {
+    if (steps.length <= 1) return;
     setSteps(steps.filter((_, i) => i !== index));
   };
 
@@ -104,23 +106,22 @@ export default function CreateRecipePage() {
     setSteps(updated);
   };
 
-  // Handle Submit & Publish Recipe
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setErrorMsg("Please enter a recipe title.");
+      setErrorMsg("Please provide a recipe title");
       return;
     }
 
-    const validIngredients = ingredients.filter(i => i.name.trim().length > 0);
+    const validIngredients = ingredients.filter((ing) => ing.name.trim().length > 0);
     if (validIngredients.length === 0) {
-      setErrorMsg("Please add at least one ingredient.");
+      setErrorMsg("Please add at least one ingredient");
       return;
     }
 
-    const validSteps = steps.filter(s => s.trim().length > 0);
+    const validSteps = steps.filter((step) => step.trim().length > 0);
     if (validSteps.length === 0) {
-      setErrorMsg("Please add at least one cooking instruction step.");
+      setErrorMsg("Please add at least one cooking step");
       return;
     }
 
@@ -128,26 +129,23 @@ export default function CreateRecipePage() {
     setErrorMsg("");
 
     try {
-      const slug = slugify(title);
+      const generatedSlug = slugify(title);
       const finalImage = customImageUrl.trim() || imageUrl;
 
-      // 1. Insert recipe into Supabase
+      // 1. Insert recipe into `recipes` table
       const { data: recipeData, error: recipeError } = await supabase
         .from("recipes")
         .insert({
           title: title.trim(),
-          slug,
-          description: description.trim(),
-          cuisine,
+          slug: generatedSlug,
+          description: description.trim() || null,
+          cuisine: cuisine.trim(),
           meal_type: mealType,
-          cook_time_mins: Number(cookTimeMins),
-          cost_level: Number(costLevel),
-          servings: Number(servings),
-          steps: validSteps,
+          cook_time_mins: Number(cookTimeMins) || 45,
+          servings: Number(servings) || 4,
+          cost_level: Number(costLevel) || 2,
           image_url: finalImage,
           video_url: videoUrl.trim() || null,
-          mood_tags: ["comfort"],
-          source: "community",
           is_published: true
         })
         .select("id, slug")
@@ -157,44 +155,57 @@ export default function CreateRecipePage() {
         throw new Error(recipeError.message);
       }
 
-      // 2. Fetch or insert ingredients into DB to get IDs
-      for (const ing of validIngredients) {
-        const normName = ing.name.trim().toLowerCase();
+      const newRecipeId = recipeData.id;
 
-        let { data: existingIng } = await supabase
+      // 2. Ensure ingredients exist in `ingredients` table and insert junction records in `recipe_ingredients`
+      for (const item of validIngredients) {
+        const cleanName = item.name.trim().toLowerCase();
+
+        // Find or create canonical ingredient
+        const { data: existingIng } = await supabase
           .from("ingredients")
           .select("id")
-          .eq("name", normName)
-          .single();
+          .eq("name", cleanName)
+          .maybeSingle();
 
         let ingredientId = existingIng?.id;
 
         if (!ingredientId) {
-          const { data: newIng } = await supabase
+          const { data: newIng, error: ingError } = await supabase
             .from("ingredients")
             .insert({
-              name: normName,
-              category: "other",
-              is_staple: false
+              name: cleanName,
+              category: "other"
             })
             .select("id")
             .single();
 
-          ingredientId = newIng?.id;
+          if (!ingError && newIng) {
+            ingredientId = newIng.id;
+          }
         }
 
-        if (ingredientId && recipeData?.id) {
+        if (ingredientId) {
           await supabase.from("recipe_ingredients").insert({
-            recipe_id: recipeData.id,
+            recipe_id: newRecipeId,
             ingredient_id: ingredientId,
-            qty: isNaN(Number(ing.qty)) ? null : Number(ing.qty),
-            unit: `${ing.qty} ${ing.unit}`.trim(),
-            is_core: ing.is_core,
-            notes: ""
+            quantity: item.qty.trim() || null,
+            unit: item.unit.trim() || null,
+            is_core: item.is_core
           });
         }
       }
 
+      // 3. Insert cooking steps into `recipe_steps` table
+      const stepsPayload = validSteps.map((instruction, idx) => ({
+        recipe_id: newRecipeId,
+        step_number: idx + 1,
+        instruction: instruction.trim()
+      }));
+
+      await supabase.from("recipe_steps").insert(stepsPayload);
+
+      // Redirect directly to the newly created recipe page
       router.push(`/recipe/${recipeData.slug}`);
     } catch (err: any) {
       console.error("Failed to create recipe:", err);
@@ -209,7 +220,7 @@ export default function CreateRecipePage() {
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="w-10 h-10 rounded-full bg-white border border-[#EAE4D7] flex items-center justify-center text-foreground hover:bg-[#FAF7F2] transition-colors"
+          className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-foreground hover:bg-muted transition-colors"
           aria-label="Back"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -226,7 +237,7 @@ export default function CreateRecipePage() {
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-50 text-error rounded-2xl border border-red-200 text-xs sm:text-sm font-semibold flex items-center gap-2">
+        <div className="p-4 bg-red-500/10 text-error rounded-2xl border border-red-500/20 text-xs sm:text-sm font-semibold flex items-center gap-2">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -234,8 +245,8 @@ export default function CreateRecipePage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* SECTION 1: BASICS */}
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EAE4D7] shadow-xs space-y-4">
-          <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-[#F0ECE3]">
+        <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
+          <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-border-light">
             <span>1. Recipe Details</span>
           </h2>
 
@@ -244,7 +255,7 @@ export default function CreateRecipePage() {
             <input
               type="text"
               required
-              className="w-full px-4 py-3 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+              className="w-full px-4 py-3 bg-card-warm border border-border rounded-xl text-foreground font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
               placeholder="e.g. Seafood Okra Soup, Mama's Party Jollof..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -255,7 +266,7 @@ export default function CreateRecipePage() {
             <label className="text-xs font-bold text-foreground">Short Description</label>
             <textarea
               rows={2}
-              className="w-full p-4 bg-[#FAF7F2] border border-[#EAE4D7] rounded-2xl text-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+              className="w-full p-4 bg-card-warm border border-border rounded-2xl text-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
               placeholder="What makes this dish special? (e.g. Smoky, rich with fresh prawns and ugwu leaves)"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -271,7 +282,7 @@ export default function CreateRecipePage() {
               <select
                 value={cuisine}
                 onChange={(e) => setCuisine(e.target.value)}
-                className="w-full px-3 py-2.5 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full px-3 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
                 <option value="nigerian">Nigerian</option>
                 <option value="igbo">Igbo food</option>
@@ -290,7 +301,7 @@ export default function CreateRecipePage() {
               <select
                 value={mealType}
                 onChange={(e) => setMealType(e.target.value)}
-                className="w-full px-3 py-2.5 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full px-3 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
                 <option value="soup">Soup & Stew</option>
                 <option value="dinner">Dinner</option>
@@ -310,7 +321,7 @@ export default function CreateRecipePage() {
                 max="300"
                 value={cookTimeMins}
                 onChange={(e) => setCookTimeMins(Number(e.target.value))}
-                className="w-full px-3 py-2.5 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full px-3 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
 
@@ -324,15 +335,15 @@ export default function CreateRecipePage() {
                 max="20"
                 value={servings}
                 onChange={(e) => setServings(Number(e.target.value))}
-                className="w-full px-3 py-2.5 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full px-3 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
           </div>
         </div>
 
         {/* SECTION 2: PHOTO & VIDEO */}
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EAE4D7] shadow-xs space-y-4">
-          <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-[#F0ECE3]">
+        <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
+          <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-border-light">
             <span>2. Cover Photo & Video</span>
           </h2>
 
@@ -365,7 +376,7 @@ export default function CreateRecipePage() {
             <label className="text-xs font-bold text-foreground">Or Custom Image URL</label>
             <input
               type="url"
-              className="w-full px-4 py-2.5 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-4 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
               placeholder="https://images.unsplash.com/..."
               value={customImageUrl}
               onChange={(e) => setCustomImageUrl(e.target.value)}
@@ -376,7 +387,7 @@ export default function CreateRecipePage() {
             <label className="text-xs font-bold text-foreground">Optional YouTube Video Link</label>
             <input
               type="url"
-              className="w-full px-4 py-2.5 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-4 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
               placeholder="https://www.youtube.com/watch?v=..."
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
@@ -385,8 +396,8 @@ export default function CreateRecipePage() {
         </div>
 
         {/* SECTION 3: INGREDIENTS BUILDER */}
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EAE4D7] shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#F0ECE3]">
+        <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-border-light">
             <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider">
               3. Ingredients ({ingredients.length})
             </h2>
@@ -404,7 +415,7 @@ export default function CreateRecipePage() {
             {ingredients.map((ing, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 p-3 bg-[#FAF7F2] rounded-2xl border border-[#EAE4D7]"
+                className="flex items-center gap-2 p-3 bg-card-warm rounded-2xl border border-border"
               >
                 <input
                   type="text"
@@ -412,7 +423,7 @@ export default function CreateRecipePage() {
                   placeholder="Ingredient (e.g. Rice, Palm oil, Ugu)"
                   value={ing.name}
                   onChange={(e) => updateIngredientRow(idx, "name", e.target.value)}
-                  className="flex-1 px-3 py-2 bg-white border border-[#EAE4D7] rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="flex-1 px-3 py-2 bg-card border border-border rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
 
                 <input
@@ -420,7 +431,7 @@ export default function CreateRecipePage() {
                   placeholder="Qty"
                   value={ing.qty}
                   onChange={(e) => updateIngredientRow(idx, "qty", e.target.value)}
-                  className="w-16 px-2 py-2 bg-white border border-[#EAE4D7] rounded-xl text-foreground text-xs font-medium text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-16 px-2 py-2 bg-card border border-border rounded-xl text-foreground text-xs font-medium text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
 
                 <input
@@ -428,7 +439,7 @@ export default function CreateRecipePage() {
                   placeholder="Unit"
                   value={ing.unit}
                   onChange={(e) => updateIngredientRow(idx, "unit", e.target.value)}
-                  className="w-20 px-2 py-2 bg-white border border-[#EAE4D7] rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-20 px-2 py-2 bg-card border border-border rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
 
                 <label className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground cursor-pointer select-none">
@@ -444,7 +455,7 @@ export default function CreateRecipePage() {
                 <button
                   type="button"
                   onClick={() => removeIngredientRow(idx)}
-                  className="w-7 h-7 rounded-lg text-muted-foreground hover:text-error hover:bg-red-50 flex items-center justify-center transition-colors"
+                  className="w-7 h-7 rounded-lg text-muted-foreground hover:text-error hover:bg-red-500/10 flex items-center justify-center transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -454,8 +465,8 @@ export default function CreateRecipePage() {
         </div>
 
         {/* SECTION 4: STEP-BY-STEP INSTRUCTIONS */}
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EAE4D7] shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-[#F0ECE3]">
+        <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-border-light">
             <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider">
               4. Cooking Steps ({steps.length})
             </h2>
@@ -481,12 +492,12 @@ export default function CreateRecipePage() {
                   placeholder={`Step ${idx + 1} instructions...`}
                   value={step}
                   onChange={(e) => updateStepRow(idx, e.target.value)}
-                  className="flex-1 p-3 bg-[#FAF7F2] border border-[#EAE4D7] rounded-xl text-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                  className="flex-1 p-3 bg-card-warm border border-border rounded-xl text-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
                 />
                 <button
                   type="button"
                   onClick={() => removeStepRow(idx)}
-                  className="w-8 h-8 rounded-lg text-muted-foreground hover:text-error hover:bg-red-50 flex items-center justify-center transition-colors mt-1"
+                  className="w-8 h-8 rounded-lg text-muted-foreground hover:text-error hover:bg-red-500/10 flex items-center justify-center transition-colors mt-1"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
