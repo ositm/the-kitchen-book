@@ -48,7 +48,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${sansFont.variable} ${serifFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col md:flex-row bg-background text-foreground pb-20 md:pb-0">
+      <body className="min-h-full flex flex-col md:flex-row bg-background text-foreground pb-24 md:pb-0">
         <ThemeProvider>
           <AuthProvider>
             <Navigation />
