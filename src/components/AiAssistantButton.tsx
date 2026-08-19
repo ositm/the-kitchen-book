@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Sparkles } from "lucide-react";
 import AiMealSuggesterModal from "./AiMealSuggesterModal";
 
 export default function AiAssistantButton() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+
+  if (pathname === "/") {
+    return null;
+  }
 
   return (
     <>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import AuthModal from "./AuthModal";
 import ThemeToggle from "./ThemeToggle";
@@ -22,6 +22,7 @@ export const NIGERIAN_CITIES = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
 
@@ -31,6 +32,11 @@ export default function Header() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [headerSearch, setHeaderSearch] = useState("");
   const [hasNotification, setHasNotification] = useState(true);
+
+  // Home screen has its own integrated Top bar matching mockup v2 exactly
+  if (pathname === "/") {
+    return null;
+  }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,133 +1,127 @@
 @import "tailwindcss";
 
 :root {
-  /* Warm Culinary Light Palette */
-  --background: #FFF9ED;
-  --background-secondary: #F6F3EA;
-  --foreground: #1F2937;
-  
-  /* Primary Brand: Forest Green */
-  --primary: #18533A;
-  --primary-foreground: #FFFFFF;
-  --primary-dark: #113E2B;
-  --primary-light: #EBF5EE;
-  --primary-subtle: #D8ECE0;
+  /* The Kitchen Book Design Tokens (Redesign v2) */
+  --ink: #141310;           /* page background */
+  --surface: #1E1B16;       /* card/input background */
+  --cream: #F7F1E4;         /* primary text */
+  --tan: #A79A83;           /* secondary/muted text */
+  --pepper: #FF5A36;        /* primary accent — CTAs, active states, protein tag */
+  --palm: #FFC24B;          /* secondary accent — highlights, spice tag */
+  --ugu: #3F7D5C;           /* tertiary accent — mood card, veg tag base */
+  --ugu-light: #6DA184;     /* veg tag text on ugu tint */
+  --berry: #8B3A5A;         /* reserved for a 4th mood card */
+  --line: rgba(247, 241, 228, 0.09); /* hairline dividers/borders */
 
-  /* Secondary Green: Soft Sage */
-  --sage: #A8C59A;
-  --sage-light: #F2F7F0;
-  --sage-border: #C8DEC0;
-
-  /* Warm Food Accent: Appetite Orange */
-  --accent: #FF8A3D;
-  --accent-foreground: #FFFFFF;
-  --accent-light: #FFF2EB;
-  --accent-dark: #E66E20;
-
-  /* Crisp White Card Surfaces */
-  --card: #FFFFFF;
-  --card-foreground: #1F2937;
-  --card-warm: #FBF9F4;
-  --card-muted: #F6F3EA;
-
-  /* Neutrals & Borders */
-  --muted: #F3EFE6;
-  --muted-foreground: #6B7280;
-  --border: #EAE4D7;
-  --border-light: #F0ECE3;
-  --ring: #18533A;
-
-  /* Feedback Colors */
-  --success: #2E8B57;
-  --warning: #F59E0B;
-  --error: #DC5A4A;
+  /* Legacy semantic variables aligned to warm cocoa palette */
+  --background: var(--ink);
+  --background-secondary: var(--surface);
+  --foreground: var(--cream);
+  --card: var(--surface);
+  --card-foreground: var(--cream);
+  --card-warm: var(--surface);
+  --card-muted: var(--ink);
+  --muted: var(--surface);
+  --muted-foreground: var(--tan);
+  --border: var(--line);
+  --border-light: var(--line);
+  --primary: var(--pepper);
+  --primary-foreground: var(--ink);
+  --accent: var(--palm);
+  --accent-foreground: var(--ink);
+  --sage: var(--ugu);
+  --sage-light: rgba(63, 125, 92, 0.22);
+  --sage-border: rgba(63, 125, 92, 0.4);
 }
 
 .dark {
-  /* Rich Obsidian & Emerald Culinary Dark Palette */
-  --background: #111613;
-  --background-secondary: #161D19;
-  --foreground: #F3F4F6;
-  
-  /* Primary Brand: Emerald Green */
-  --primary: #2E8B57;
-  --primary-foreground: #FFFFFF;
-  --primary-dark: #1E6B40;
-  --primary-light: #183124;
-  --primary-subtle: #204231;
+  --ink: #141310;
+  --surface: #1E1B16;
+  --cream: #F7F1E4;
+  --tan: #A79A83;
+  --pepper: #FF5A36;
+  --palm: #FFC24B;
+  --ugu: #3F7D5C;
+  --ugu-light: #6DA184;
+  --berry: #8B3A5A;
+  --line: rgba(247, 241, 228, 0.09);
 
-  /* Secondary Green: Soft Mint Sage */
-  --sage: #6EE7B7;
-  --sage-light: #162B20;
-  --sage-border: #2B5742;
-
-  /* Warm Food Accent: Warm Amber Orange */
-  --accent: #FF9F5A;
-  --accent-foreground: #111613;
-  --accent-light: #332014;
-  --accent-dark: #FF7E26;
-
-  /* Dark Card Surfaces */
-  --card: #18201B;
-  --card-foreground: #F3F4F6;
-  --card-warm: #1D2621;
-  --card-muted: #141A16;
-
-  /* Neutrals & Borders */
-  --muted: #202A24;
-  --muted-foreground: #9CA3AF;
-  --border: #2B3830;
-  --border-light: #34443B;
-  --ring: #34D399;
-
-  /* Feedback Colors */
-  --success: #34D399;
-  --warning: #FBBF24;
-  --error: #F87171;
+  --background: var(--ink);
+  --background-secondary: var(--surface);
+  --foreground: var(--cream);
+  --card: var(--surface);
+  --card-foreground: var(--cream);
+  --card-warm: var(--surface);
+  --card-muted: var(--ink);
+  --muted: var(--surface);
+  --muted-foreground: var(--tan);
+  --border: var(--line);
+  --border-light: var(--line);
+  --primary: var(--pepper);
+  --primary-foreground: var(--ink);
+  --accent: var(--palm);
+  --accent-foreground: var(--ink);
+  --sage: var(--ugu);
+  --sage-light: rgba(63, 125, 92, 0.22);
+  --sage-border: rgba(63, 125, 92, 0.4);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-background-secondary: var(--background-secondary);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary-dark: var(--primary-dark);
-  --color-primary-light: var(--primary-light);
-  --color-primary-subtle: var(--primary-subtle);
-  --color-sage: var(--sage);
-  --color-sage-light: var(--sage-light);
-  --color-sage-border: var(--sage-border);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent-light: var(--accent-light);
-  --color-accent-dark: var(--accent-dark);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-card-warm: var(--card-warm);
-  --color-card-muted: var(--card-muted);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-border: var(--border);
-  --color-border-light: var(--border-light);
-  --color-ring: var(--ring);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-  --font-sans: var(--font-sans), var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-serif: var(--font-serif), Georgia, serif;
+  --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-cream: var(--cream);
+  --color-tan: var(--tan);
+  --color-pepper: var(--pepper);
+  --color-palm: var(--palm);
+  --color-ugu: var(--ugu);
+  --color-ugu-light: var(--ugu-light);
+  --color-berry: var(--berry);
+  --color-line: var(--line);
+
+  --color-background: var(--ink);
+  --color-background-secondary: var(--surface);
+  --color-foreground: var(--cream);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--cream);
+  --color-card-warm: var(--surface);
+  --color-card-muted: var(--ink);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--tan);
+  --color-border: var(--line);
+  --color-border-light: var(--line);
+  --color-primary: var(--pepper);
+  --color-primary-foreground: var(--ink);
+  --color-accent: var(--palm);
+  --color-accent-foreground: var(--ink);
+  --color-sage: var(--ugu);
+  --color-sage-light: var(--ugu-light);
+
+  --font-display: var(--font-display), "Bricolage Grotesque", system-ui, sans-serif;
+  --font-body: var(--font-body), "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-mono), "Space Mono", monospace;
+  --font-sans: var(--font-body), "Inter", system-ui, sans-serif;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+  background-color: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body), 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Custom utility classes */
+/* Custom font helper classes */
+.font-display {
+  font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
+}
+.font-mono {
+  font-family: var(--font-mono), 'Space Mono', monospace;
+}
+.font-body {
+  font-family: var(--font-body), 'Inter', sans-serif;
+}
+
+/* Scrollbar utilities */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -136,16 +130,7 @@ body {
   scrollbar-width: none;
 }
 
-/* Subtle food magazine card hover */
-.food-card-hover {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.food-card-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.12), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
-}
-
-/* Mobile-friendly safe padding */
+/* Mobile-friendly safe area */
 @supports (padding: max(0px)) {
   .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
