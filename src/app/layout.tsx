@@ -57,13 +57,13 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col md:flex-row bg-[var(--ink)] text-[var(--cream)] pb-24 md:pb-0">
+      <body className="min-h-full flex flex-col md:flex-row bg-[var(--ink)] text-[var(--cream)] pb-24 md:pb-0 overflow-x-hidden">
         <ThemeProvider>
           <AuthProvider>
             <Navigation />
-            <div className="flex-1 flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col min-h-screen min-w-0 w-full">
               <Header />
-              <main className="flex-1 w-full max-w-5xl mx-auto">
+              <main className="flex-1 w-full max-w-5xl mx-auto min-w-0">
                 {children}
               </main>
             </div>

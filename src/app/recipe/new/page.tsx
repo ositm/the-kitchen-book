@@ -109,19 +109,19 @@ export default function CreateRecipePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setErrorMsg("Please provide a recipe title");
+      setErrorMsg("Please provide a recipe title.");
       return;
     }
 
-    const validIngredients = ingredients.filter((ing) => ing.name.trim().length > 0);
+    const validIngredients = ingredients.filter((i) => i.name.trim().length > 0);
     if (validIngredients.length === 0) {
-      setErrorMsg("Please add at least one ingredient");
+      setErrorMsg("Please add at least one ingredient to your recipe.");
       return;
     }
 
-    const validSteps = steps.filter((step) => step.trim().length > 0);
+    const validSteps = steps.filter((s) => s.trim().length > 0);
     if (validSteps.length === 0) {
-      setErrorMsg("Please add at least one cooking step");
+      setErrorMsg("Please add at least one cooking step.");
       return;
     }
 
@@ -129,24 +129,25 @@ export default function CreateRecipePage() {
     setErrorMsg("");
 
     try {
-      const generatedSlug = slugify(title);
       const finalImage = customImageUrl.trim() || imageUrl;
+      const slug = slugify(title);
 
-      // 1. Insert recipe into `recipes` table
+      // 1. Insert base recipe into Supabase `recipes` table
       const { data: recipeData, error: recipeError } = await supabase
         .from("recipes")
         .insert({
           title: title.trim(),
-          slug: generatedSlug,
-          description: description.trim() || null,
-          cuisine: cuisine.trim(),
+          slug,
+          description: description.trim(),
+          cuisine,
           meal_type: mealType,
-          cook_time_mins: Number(cookTimeMins) || 45,
-          servings: Number(servings) || 4,
-          cost_level: Number(costLevel) || 2,
+          cook_time_mins: cookTimeMins,
+          servings,
+          cost_level: costLevel,
           image_url: finalImage,
           video_url: videoUrl.trim() || null,
-          is_published: true
+          is_featured: false,
+          created_at: new Date().toISOString()
         })
         .select("id, slug")
         .single();
@@ -215,29 +216,29 @@ export default function CreateRecipePage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-28 max-w-2xl mx-auto">
+    <div className="flex flex-col gap-6 pb-28 max-w-2xl w-full mx-auto px-4 sm:px-6 md:px-8 py-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-foreground hover:bg-muted transition-colors"
+          className="w-10 h-10 rounded-full bg-[var(--surface)] border border-[var(--line)] flex items-center justify-center text-[var(--cream)] hover:bg-[var(--surface-warm)] transition-colors shadow-2xs"
           aria-label="Back"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-wider mb-0.5">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--pepper)] uppercase tracking-wider mb-0.5 font-mono">
             <ChefHat className="w-4 h-4" />
             <span>Recipe Studio</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight font-serif">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--cream)] tracking-tight font-display">
             Create Your Recipe 🍳
           </h1>
         </div>
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-500/10 text-error rounded-2xl border border-red-500/20 text-xs sm:text-sm font-semibold flex items-center gap-2">
+        <div className="p-4 bg-red-500/10 text-red-500 rounded-2xl border border-red-500/20 text-xs sm:text-sm font-semibold flex items-center gap-2 font-body">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -245,17 +246,17 @@ export default function CreateRecipePage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* SECTION 1: BASICS */}
-        <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
-          <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-border-light">
+        <div className="bg-[var(--surface)] rounded-3xl p-5 sm:p-6 border border-[var(--line)] shadow-sm space-y-4">
+          <h2 className="text-xs sm:text-sm font-extrabold text-[var(--cream)] uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-[var(--line)] font-mono">
             <span>1. Recipe Details</span>
           </h2>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground">Recipe Title *</label>
+            <label className="text-xs font-bold text-[var(--cream)] font-mono">Recipe Title *</label>
             <input
               type="text"
               required
-              className="w-full px-4 py-3 bg-card-warm border border-border rounded-xl text-foreground font-semibold text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+              className="w-full px-4 py-3 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] font-semibold text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] focus:border-[var(--pepper)] transition-all font-display placeholder:text-[var(--tan)]"
               placeholder="e.g. Seafood Okra Soup, Mama's Party Jollof..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -263,10 +264,10 @@ export default function CreateRecipePage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground">Short Description</label>
+            <label className="text-xs font-bold text-[var(--cream)] font-mono">Short Description</label>
             <textarea
               rows={2}
-              className="w-full p-4 bg-card-warm border border-border rounded-2xl text-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+              className="w-full p-4 bg-[var(--surface-warm)] border border-[var(--line)] rounded-2xl text-[var(--cream)] text-xs sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] focus:border-[var(--pepper)] resize-none transition-all font-body placeholder:text-[var(--tan)]"
               placeholder="What makes this dish special? (e.g. Smoky, rich with fresh prawns and ugwu leaves)"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -276,13 +277,13 @@ export default function CreateRecipePage() {
           {/* Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             <div>
-              <label className="text-[11px] font-bold text-muted-foreground uppercase block mb-1">
+              <label className="text-[11px] font-bold text-[var(--tan)] uppercase block mb-1 font-mono">
                 Cuisine
               </label>
               <select
                 value={cuisine}
                 onChange={(e) => setCuisine(e.target.value)}
-                className="w-full px-3 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full px-3 py-2.5 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[var(--pepper)]"
               >
                 <option value="nigerian">Nigerian</option>
                 <option value="igbo">Igbo food</option>
@@ -295,13 +296,13 @@ export default function CreateRecipePage() {
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-muted-foreground uppercase block mb-1">
+              <label className="text-[11px] font-bold text-[var(--tan)] uppercase block mb-1 font-mono">
                 Meal Type
               </label>
               <select
                 value={mealType}
                 onChange={(e) => setMealType(e.target.value)}
-                className="w-full px-3 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full px-3 py-2.5 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[var(--pepper)]"
               >
                 <option value="soup">Soup & Stew</option>
                 <option value="dinner">Dinner</option>
@@ -312,7 +313,7 @@ export default function CreateRecipePage() {
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-muted-foreground uppercase block mb-1">
+              <label className="text-[11px] font-bold text-[var(--tan)] uppercase block mb-1 font-mono">
                 Cook Time (mins)
               </label>
               <input
@@ -321,12 +322,12 @@ export default function CreateRecipePage() {
                 max="300"
                 value={cookTimeMins}
                 onChange={(e) => setCookTimeMins(Number(e.target.value))}
-                className="w-full px-3 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full px-3 py-2.5 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-bold text-center focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] font-mono"
               />
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-muted-foreground uppercase block mb-1">
+              <label className="text-[11px] font-bold text-[var(--tan)] uppercase block mb-1 font-mono">
                 Servings
               </label>
               <input
@@ -335,23 +336,23 @@ export default function CreateRecipePage() {
                 max="20"
                 value={servings}
                 onChange={(e) => setServings(Number(e.target.value))}
-                className="w-full px-3 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full px-3 py-2.5 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-bold text-center focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] font-mono"
               />
             </div>
           </div>
         </div>
 
         {/* SECTION 2: PHOTO & VIDEO */}
-        <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
-          <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-border-light">
+        <div className="bg-[var(--surface)] rounded-3xl p-5 sm:p-6 border border-[var(--line)] shadow-sm space-y-4">
+          <h2 className="text-xs sm:text-sm font-extrabold text-[var(--cream)] uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-[var(--line)] font-mono">
             <span>2. Cover Photo & Video</span>
           </h2>
 
           <div>
-            <label className="text-xs font-bold text-foreground block mb-2">
+            <label className="text-xs font-bold text-[var(--cream)] block mb-2 font-mono">
               Select Preset Photo
             </label>
-            <div className="flex items-center gap-2.5 overflow-x-auto pb-2 hide-scrollbar">
+            <div className="flex items-center gap-2.5 overflow-x-auto pb-2 hide-scrollbar overscroll-x-contain touch-pan-x -mx-2 px-2">
               {PRESET_RECIPE_IMAGES.map((img, i) => (
                 <button
                   key={i}
@@ -362,8 +363,8 @@ export default function CreateRecipePage() {
                   }}
                   className={`relative w-20 h-20 rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all ${
                     imageUrl === img && !customImageUrl
-                      ? "border-primary scale-105 shadow-2xs"
-                      : "border-border opacity-70"
+                      ? "border-[var(--pepper)] scale-105 shadow-2xs"
+                      : "border-[var(--line)] opacity-70"
                   }`}
                 >
                   <Image src={img} alt="Preset preview" fill className="object-cover" />
@@ -373,10 +374,10 @@ export default function CreateRecipePage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground">Or Custom Image URL</label>
+            <label className="text-xs font-bold text-[var(--cream)] font-mono">Or Custom Image URL</label>
             <input
               type="url"
-              className="w-full px-4 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-4 py-2.5 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] placeholder:text-[var(--tan)] font-mono"
               placeholder="https://images.unsplash.com/..."
               value={customImageUrl}
               onChange={(e) => setCustomImageUrl(e.target.value)}
@@ -384,10 +385,10 @@ export default function CreateRecipePage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground">Optional YouTube Video Link</label>
+            <label className="text-xs font-bold text-[var(--cream)] font-mono">Optional YouTube Video Link</label>
             <input
               type="url"
-              className="w-full px-4 py-2.5 bg-card-warm border border-border rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-4 py-2.5 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] placeholder:text-[var(--tan)] font-mono"
               placeholder="https://www.youtube.com/watch?v=..."
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
@@ -396,15 +397,15 @@ export default function CreateRecipePage() {
         </div>
 
         {/* SECTION 3: INGREDIENTS BUILDER */}
-        <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-border-light">
-            <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider">
+        <div className="bg-[var(--surface)] rounded-3xl p-5 sm:p-6 border border-[var(--line)] shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-[var(--line)]">
+            <h2 className="text-xs sm:text-sm font-extrabold text-[var(--cream)] uppercase tracking-wider font-mono">
               3. Ingredients ({ingredients.length})
             </h2>
             <button
               type="button"
               onClick={addIngredientRow}
-              className="bg-sage-light text-primary hover:bg-primary hover:text-white font-bold text-xs px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1 border border-sage-border/50"
+              className="bg-[var(--pepper)] text-white hover:opacity-90 font-bold text-xs px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 shadow-2xs font-display"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Add Ingredient</span>
@@ -415,65 +416,68 @@ export default function CreateRecipePage() {
             {ingredients.map((ing, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 p-3 bg-card-warm rounded-2xl border border-border"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-3 bg-[var(--surface-warm)] rounded-2xl border border-[var(--line)]"
               >
                 <input
                   type="text"
                   required
-                  placeholder="Ingredient (e.g. Rice, Palm oil, Ugu)"
+                  placeholder="Ingredient (e.g. Rice, Palm oil, Crayfish)"
                   value={ing.name}
                   onChange={(e) => updateIngredientRow(idx, "name", e.target.value)}
-                  className="flex-1 px-3 py-2 bg-card border border-border rounded-xl text-foreground text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="flex-1 min-w-0 px-3 py-2 bg-[var(--surface)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] placeholder:text-[var(--tan)]"
                 />
 
-                <input
-                  type="text"
-                  placeholder="Qty"
-                  value={ing.qty}
-                  onChange={(e) => updateIngredientRow(idx, "qty", e.target.value)}
-                  className="w-16 px-2 py-2 bg-card border border-border rounded-xl text-foreground text-xs font-medium text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-
-                <input
-                  type="text"
-                  placeholder="Unit"
-                  value={ing.unit}
-                  onChange={(e) => updateIngredientRow(idx, "unit", e.target.value)}
-                  className="w-20 px-2 py-2 bg-card border border-border rounded-xl text-foreground text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-
-                <label className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground cursor-pointer select-none">
+                <div className="flex items-center gap-2">
                   <input
-                    type="checkbox"
-                    checked={ing.is_core}
-                    onChange={(e) => updateIngredientRow(idx, "is_core", e.target.checked)}
-                    className="rounded text-primary focus:ring-primary w-3.5 h-3.5"
+                    type="text"
+                    placeholder="Qty"
+                    value={ing.qty}
+                    onChange={(e) => updateIngredientRow(idx, "qty", e.target.value)}
+                    className="w-16 px-2 py-2 bg-[var(--surface)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-medium text-center focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] placeholder:text-[var(--tan)] font-mono"
                   />
-                  <span>Core</span>
-                </label>
 
-                <button
-                  type="button"
-                  onClick={() => removeIngredientRow(idx)}
-                  className="w-7 h-7 rounded-lg text-muted-foreground hover:text-error hover:bg-red-500/10 flex items-center justify-center transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                  <input
+                    type="text"
+                    placeholder="Unit"
+                    value={ing.unit}
+                    onChange={(e) => updateIngredientRow(idx, "unit", e.target.value)}
+                    className="w-20 px-2 py-2 bg-[var(--surface)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] placeholder:text-[var(--tan)]"
+                  />
+
+                  <label className="flex items-center gap-1 text-[11px] font-semibold text-[var(--tan)] cursor-pointer select-none px-1 font-mono">
+                    <input
+                      type="checkbox"
+                      checked={ing.is_core}
+                      onChange={(e) => updateIngredientRow(idx, "is_core", e.target.checked)}
+                      className="rounded text-[var(--pepper)] focus:ring-[var(--pepper)] w-3.5 h-3.5"
+                    />
+                    <span>Core</span>
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => removeIngredientRow(idx)}
+                    className="w-7 h-7 ml-auto rounded-lg text-[var(--tan)] hover:text-red-500 hover:bg-red-500/10 flex items-center justify-center transition-colors"
+                    aria-label="Remove ingredient"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* SECTION 4: STEP-BY-STEP INSTRUCTIONS */}
-        <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-border-light">
-            <h2 className="text-xs sm:text-sm font-extrabold text-foreground uppercase tracking-wider">
+        <div className="bg-[var(--surface)] rounded-3xl p-5 sm:p-6 border border-[var(--line)] shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-[var(--line)]">
+            <h2 className="text-xs sm:text-sm font-extrabold text-[var(--cream)] uppercase tracking-wider font-mono">
               4. Cooking Steps ({steps.length})
             </h2>
             <button
               type="button"
               onClick={addStepRow}
-              className="bg-sage-light text-primary hover:bg-primary hover:text-white font-bold text-xs px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1 border border-sage-border/50"
+              className="bg-[var(--pepper)] text-white hover:opacity-90 font-bold text-xs px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 shadow-2xs font-display"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Add Step</span>
@@ -483,7 +487,7 @@ export default function CreateRecipePage() {
           <div className="space-y-3">
             {steps.map((step, idx) => (
               <div key={idx} className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-primary text-white font-extrabold text-xs flex items-center justify-center flex-shrink-0 mt-1 shadow-2xs">
+                <div className="w-8 h-8 rounded-xl bg-[var(--pepper)] text-white font-extrabold text-xs flex items-center justify-center flex-shrink-0 mt-1 shadow-2xs font-display">
                   {idx + 1}
                 </div>
                 <textarea
@@ -492,12 +496,13 @@ export default function CreateRecipePage() {
                   placeholder={`Step ${idx + 1} instructions...`}
                   value={step}
                   onChange={(e) => updateStepRow(idx, e.target.value)}
-                  className="flex-1 p-3 bg-card-warm border border-border rounded-xl text-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                  className="flex-1 min-w-0 p-3 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] resize-none transition-all font-body placeholder:text-[var(--tan)]"
                 />
                 <button
                   type="button"
                   onClick={() => removeStepRow(idx)}
-                  className="w-8 h-8 rounded-lg text-muted-foreground hover:text-error hover:bg-red-500/10 flex items-center justify-center transition-colors mt-1"
+                  className="w-8 h-8 rounded-lg text-[var(--tan)] hover:text-red-500 hover:bg-red-500/10 flex items-center justify-center transition-colors mt-1"
+                  aria-label="Remove step"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -510,7 +515,7 @@ export default function CreateRecipePage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary hover:bg-primary-dark active:scale-98 text-white font-extrabold py-4 px-6 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base disabled:opacity-50"
+          className="w-full bg-[var(--pepper)] hover:opacity-90 active:scale-98 text-white font-extrabold py-4 px-6 rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-base disabled:opacity-50 font-display"
         >
           {loading ? (
             <>

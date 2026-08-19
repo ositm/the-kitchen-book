@@ -74,29 +74,29 @@ export default function PostPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-24 max-w-xl mx-auto">
+    <div className="flex flex-col gap-6 pb-28 max-w-xl w-full mx-auto px-4 sm:px-6 md:px-8 py-6">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-1.5 text-xs font-bold text-primary uppercase tracking-wider mb-1">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--pepper)] uppercase tracking-wider mb-1 font-mono">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Cookbook Community</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight font-serif">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--cream)] tracking-tight font-display">
           Share What You Cooked 🍲
         </h1>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+        <p className="text-xs sm:text-sm text-[var(--tan)] mt-0.5 font-body">
           Inspire other home cooks across Nigeria with your culinary creation.
         </p>
       </div>
 
       {!isPosted ? (
-        <form onSubmit={handleSubmit} className="space-y-5 bg-card rounded-3xl p-6 border border-border shadow-xs">
+        <form onSubmit={handleSubmit} className="space-y-5 bg-[var(--surface)] rounded-3xl p-5 sm:p-6 border border-[var(--line)] shadow-sm">
           {/* Photo Preview & Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-foreground uppercase tracking-wider block">
+            <label className="text-xs font-bold text-[var(--cream)] uppercase tracking-wider block font-mono">
               Dish Photo
             </label>
-            <div className="relative h-64 w-full rounded-2xl overflow-hidden bg-card-warm border border-border">
+            <div className="relative h-64 w-full rounded-2xl overflow-hidden bg-[var(--surface-warm)] border border-[var(--line)]">
               <Image
                 src={customImageUrl.trim() || selectedImage}
                 alt="Dish preview"
@@ -104,7 +104,7 @@ export default function PostPage() {
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                <span className="bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <span className="bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 font-display">
                   <Camera className="w-4 h-4" />
                   <span>Choose Photo Below</span>
                 </span>
@@ -112,7 +112,7 @@ export default function PostPage() {
             </div>
 
             {/* Quick Photo Switcher */}
-            <div className="flex items-center gap-2 pt-1 overflow-x-auto hide-scrollbar">
+            <div className="flex items-center gap-2 pt-1 overflow-x-auto hide-scrollbar overscroll-x-contain touch-pan-x -mx-2 px-2">
               {SAMPLE_POST_PHOTOS.map((photo, i) => (
                 <button
                   key={i}
@@ -122,7 +122,7 @@ export default function PostPage() {
                     setCustomImageUrl("");
                   }}
                   className={`relative w-14 h-14 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
-                    selectedImage === photo && !customImageUrl ? "border-primary scale-105 shadow-xs" : "border-transparent opacity-70"
+                    selectedImage === photo && !customImageUrl ? "border-[var(--pepper)] scale-105 shadow-xs" : "border-transparent opacity-70"
                   }`}
                 >
                   <Image src={photo} alt="Thumbnail" fill className="object-cover" />
@@ -135,19 +135,19 @@ export default function PostPage() {
               placeholder="Or paste custom image URL..."
               value={customImageUrl}
               onChange={(e) => setCustomImageUrl(e.target.value)}
-              className="w-full px-3 py-2 bg-card-warm border border-border rounded-xl text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-3 py-2 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-xs font-medium text-[var(--cream)] focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] placeholder:text-[var(--tan)] font-mono"
             />
           </div>
 
           {/* Attached Recipe Tag */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground uppercase tracking-wider block">
+            <label className="text-xs font-bold text-[var(--cream)] uppercase tracking-wider block font-mono">
               Attach Recipe
             </label>
             <select
               value={selectedRecipeId}
               onChange={(e) => setSelectedRecipeId(e.target.value)}
-              className="w-full px-4 py-3 bg-card-warm border border-border rounded-xl text-foreground text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full px-4 py-3 bg-[var(--surface-warm)] border border-[var(--line)] rounded-xl text-[var(--cream)] text-xs sm:text-sm font-semibold focus:outline-none focus:ring-1 focus:ring-[var(--pepper)]"
             >
               <option value="">-- None / Custom Dish --</option>
               {recipes.map((recipe) => (
@@ -160,13 +160,13 @@ export default function PostPage() {
 
           {/* Caption Textarea */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-foreground uppercase tracking-wider block">
+            <label className="text-xs font-bold text-[var(--cream)] uppercase tracking-wider block font-mono">
               Caption
             </label>
             <textarea
               rows={3}
               required
-              className="w-full p-4 bg-card-warm border border-border rounded-2xl text-foreground placeholder:text-muted-foreground text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+              className="w-full p-4 bg-[var(--surface-warm)] border border-[var(--line)] rounded-2xl text-[var(--cream)] placeholder:text-[var(--tan)] text-xs sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[var(--pepper)] resize-none font-body"
               placeholder="Tell everyone how it tasted, what tweaks you made, or who you cooked for..."
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
@@ -174,8 +174,8 @@ export default function PostPage() {
           </div>
 
           {/* Location Tag */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-card-warm p-3 rounded-xl border border-border">
-            <MapPin className="w-4 h-4 text-primary" />
+          <div className="flex items-center gap-2 text-xs text-[var(--tan)] bg-[var(--surface-warm)] p-3 rounded-xl border border-[var(--line)] font-mono">
+            <MapPin className="w-4 h-4 text-[var(--pepper)]" />
             <span>Posting from: <strong>{location}</strong></span>
           </div>
 
@@ -183,7 +183,7 @@ export default function PostPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary-dark active:scale-98 text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-sm transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full bg-[var(--pepper)] hover:opacity-90 active:scale-98 text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-sm transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50 font-display"
           >
             {loading ? (
               <>
@@ -200,16 +200,16 @@ export default function PostPage() {
         </form>
       ) : (
         /* Success Screen */
-        <div className="bg-card rounded-3xl p-8 border border-border text-center shadow-xs space-y-6 animate-in zoom-in-95 duration-200">
-          <div className="w-16 h-16 rounded-full bg-sage-light text-primary mx-auto flex items-center justify-center shadow-2xs">
+        <div className="bg-[var(--surface)] rounded-3xl p-8 border border-[var(--line)] text-center shadow-xs space-y-6 animate-in zoom-in-95 duration-200">
+          <div className="w-16 h-16 rounded-full bg-[var(--pepper)]/15 text-[var(--pepper)] mx-auto flex items-center justify-center shadow-2xs border border-[var(--pepper)]/30">
             <Check className="w-8 h-8 stroke-[3]" />
           </div>
 
           <div className="space-y-1">
-            <h2 className="text-2xl font-extrabold text-foreground font-serif">
+            <h2 className="text-2xl font-extrabold text-[var(--cream)] font-display">
               Dish Shared to Community! 🎉
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-[var(--tan)] font-body">
               Your creation is now live on the community cookbook feed.
             </p>
           </div>
@@ -217,7 +217,7 @@ export default function PostPage() {
           {/* WhatsApp Share Button */}
           <button
             onClick={handleShareWhatsApp}
-            className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3.5 px-4 rounded-2xl shadow-xs transition-all text-sm"
+            className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3.5 px-4 rounded-2xl shadow-xs transition-all text-sm font-display"
           >
             <MessageCircle className="w-4 h-4 fill-white" />
             <span>Share Post to WhatsApp Status</span>
@@ -226,7 +226,7 @@ export default function PostPage() {
           <div className="flex gap-3">
             <Link
               href="/community"
-              className="flex-1 bg-primary text-white font-bold py-3 rounded-xl text-xs hover:bg-primary-dark transition-colors text-center"
+              className="flex-1 bg-[var(--pepper)] text-white font-bold py-3 rounded-xl text-xs hover:opacity-90 transition-opacity text-center font-display"
             >
               View in Feed
             </Link>
@@ -235,7 +235,7 @@ export default function PostPage() {
                 setIsPosted(false);
                 setCaption("");
               }}
-              className="flex-1 bg-card-warm hover:bg-muted text-foreground font-semibold py-3 rounded-xl text-xs transition-colors border border-border"
+              className="flex-1 bg-[var(--surface-warm)] hover:bg-[var(--surface)] text-[var(--cream)] font-semibold py-3 rounded-xl text-xs transition-colors border border-[var(--line)] font-mono"
             >
               Share Another
             </button>
