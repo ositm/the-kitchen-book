@@ -49,7 +49,7 @@ export default function Header() {
     user?.user_metadata?.full_name ||
     user?.user_metadata?.name ||
     user?.email?.split("@")[0] ||
-    "Chef Ugo";
+    "Chef";
 
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
 

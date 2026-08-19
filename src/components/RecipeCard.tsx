@@ -57,11 +57,11 @@ export default function RecipeCard({
   const estimatedCost = cost_level === 1 ? "₦1,800" : cost_level === 2 ? "₦3,500" : "₦8,200";
 
   // Match score visual styling
-  let badgeColor = "bg-primary text-white";
+  let badgeColor = "bg-[var(--pepper)] text-white";
   if (matchScore !== undefined) {
-    if (matchScore >= 80) badgeColor = "bg-[#2E8B57] text-white";
-    else if (matchScore >= 50) badgeColor = "bg-[#F59E0B] text-white";
-    else badgeColor = "bg-muted text-muted-foreground";
+    if (matchScore >= 80) badgeColor = "bg-[var(--pepper)] text-white";
+    else if (matchScore >= 50) badgeColor = "bg-[var(--palm)] text-[var(--ink)]";
+    else badgeColor = "bg-[var(--surface-warm)] text-[var(--tan)]";
   }
 
   const cuisineLabel = cuisine?.toLowerCase() === "nigerian" && region 
@@ -136,8 +136,8 @@ export default function RecipeCard({
 
           {/* Have / Total ingredient counts indicator */}
           {haveCount !== undefined && totalCount !== undefined && (
-            <p className="text-[11px] text-muted-foreground mt-1.5 flex items-center gap-1 font-medium">
-              <span className={haveCount === totalCount ? "text-[#2E8B57] font-bold" : "text-foreground font-semibold"}>
+            <p className="text-[11px] text-[var(--tan)] mt-1.5 flex items-center gap-1 font-medium">
+              <span className={haveCount === totalCount ? "text-[var(--pepper)] font-bold" : "text-[var(--cream)] font-semibold"}>
                 You have {haveCount} of {totalCount}
               </span>
               <span>ingredients</span>

@@ -6,14 +6,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { usePantry } from "@/lib/pantryStore";
+import { useMoods, MOOD_COLOR_MAP } from "@/lib/moodStore";
 import { CANONICAL_INGREDIENTS } from "@/components/IngredientSearch";
 import RecipeCard from "@/components/RecipeCard";
 import AiMealSuggesterModal from "@/components/AiMealSuggesterModal";
+import CustomizeMoodsModal from "@/components/CustomizeMoodsModal";
 import AuthModal from "@/components/AuthModal";
 import ThemeToggle from "@/components/ThemeToggle";
 import { supabase } from "@/lib/supabase";
 import { sortRecipesWithNigerianPriority } from "@/lib/matchingEngine";
-import { ChevronDown, MapPin, Sparkles, ArrowRight, Flame, Search, Bell } from "lucide-react";
+import { ChevronDown, MapPin, Sparkles, ArrowRight, Flame, Search, SlidersHorizontal, Plus } from "lucide-react";
 
 export const NIGERIAN_CITIES = [
   "Lagos",
@@ -27,7 +29,7 @@ export const NIGERIAN_CITIES = [
   "Asaba"
 ];
 
-// Helper to determine category for color-coding pantry tags
+// Helper to determine category for color-coding pantry tags (NO GREEN)
 function getIngredientCategory(name: string): "protein" | "veg" | "spice" {
   const n = name.toLowerCase().trim();
   const canonical = CANONICAL_INGREDIENTS.find(
@@ -82,43 +84,17 @@ function getIngredientCategory(name: string): "protein" | "veg" | "spice" {
   return "spice";
 }
 
-// 3 Curated & Top-Ranked Mood Cards (The one bold focal moment)
-const MOOD_CARDS = [
-  {
-    id: "broke_week",
-    tag: "Broke week",
-    label: "Still eating good",
-    colorClass: "bg-[var(--pepper)]",
-    tagClass: "text-white/85",
-    labelClass: "text-white",
-  },
-  {
-    id: "rainy_day",
-    tag: "Rainy day",
-    label: "Pepper soup weather",
-    colorClass: "bg-[var(--ugu)]",
-    tagClass: "text-white/85",
-    labelClass: "text-white",
-  },
-  {
-    id: "quick",
-    tag: "20 minutes",
-    label: "In, out, fed",
-    colorClass: "bg-[var(--palm)]",
-    tagClass: "text-[var(--ink)]/65",
-    labelClass: "text-[var(--ink)]",
-  },
-];
-
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { items, count, isReady } = usePantry();
+  const { moods } = useMoods();
 
   const [selectedCity, setSelectedCity] = useState("Lagos");
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
+  const [showMoodsModal, setShowMoodsModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [timeString, setTimeString] = useState("Wednesday, 7:42am");
   const [recipes, setRecipes] = useState<any[]>([]);
@@ -182,34 +158,34 @@ export default function HomeScreen() {
     }
   };
 
-  // Resolved user first name
+  // Resolved user name — always defaults to "Chef" instead of hardcoded names
   const firstName =
     user?.user_metadata?.full_name?.split(" ")[0] ||
     user?.user_metadata?.name?.split(" ")[0] ||
-    (user?.email ? user.email.split("@")[0] : "Ugo");
+    (user?.email ? user.email.split("@")[0] : "Chef");
 
-  const avatarInitial = firstName.charAt(0).toUpperCase() || "U";
+  const avatarInitial = firstName.charAt(0).toUpperCase() || "C";
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
 
-  // Pantry display items: on mobile max 5, on tablet/web show up to 8
+  // Pantry display items
   const maxInlineTags = 8;
   const displayItems = isReady ? items.slice(0, maxInlineTags) : ["onions", "tomatoes", "scotch bonnet", "palm oil", "crayfish"];
   const moreCount = isReady ? Math.max(0, items.length - maxInlineTags) : 2;
   const totalCount = isReady ? count : 10;
 
   return (
-    <div className="min-h-screen bg-[var(--ink)] text-[var(--cream)] flex justify-center selection:bg-[var(--pepper)] selection:text-[var(--ink)]">
+    <div className="min-h-screen bg-[var(--ink)] text-[var(--cream)] flex justify-center selection:bg-[var(--pepper)] selection:text-white transition-colors duration-200">
       {/* Responsive Container: mobile 380px frame metrics, expands gracefully up to 5xl on desktop */}
       <div className="w-full max-w-5xl mx-auto flex flex-col pb-20 px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 space-y-6 sm:space-y-8">
         
-        {/* 1. TOP BAR — DYNAMIC FOR MOBILE & WEB */}
+        {/* 1. TOP BAR — DYNAMIC FOR MOBILE & WEB (LIGHT & DARK COMPATIBLE) */}
         <header className="topbar flex items-center justify-between gap-3 sm:gap-4 w-full">
           {/* Location Pill */}
           <div className="relative shrink-0">
             <button
               type="button"
               onClick={() => setShowLocationDropdown(!showLocationDropdown)}
-              className="locale flex items-center gap-[6px] text-[13px] sm:text-sm font-semibold text-[var(--cream)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--pepper)] rounded-full px-2 py-1 bg-[var(--surface)]/50 sm:bg-[var(--surface)] border border-[var(--line)]"
+              className="locale flex items-center gap-[6px] text-[13px] sm:text-sm font-semibold text-[var(--cream)] hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--pepper)] rounded-full px-2.5 py-1.5 bg-[var(--surface)] border border-[var(--line)] shadow-2xs"
               aria-label="Select city"
             >
               <span className="dot w-[6px] h-[6px] rounded-full bg-[var(--pepper)] shrink-0" />
@@ -245,7 +221,7 @@ export default function HomeScreen() {
             )}
           </div>
 
-          {/* Search Input (Expands gracefully on web) */}
+          {/* Search Input */}
           <form onSubmit={handleSearchSubmit} className="flex-1 max-w-full sm:max-w-md md:max-w-lg min-w-0">
             <div className="relative">
               <input
@@ -253,7 +229,7 @@ export default function HomeScreen() {
                 placeholder="search recipes, ingredients…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="search w-full bg-[var(--surface)] border border-[var(--line)] rounded-[12px] px-[12px] py-[9px] text-[12px] sm:text-xs text-[var(--cream)] placeholder:text-[var(--tan)] font-mono focus:outline-none focus:border-[var(--pepper)] focus:ring-1 focus:ring-[var(--pepper)] transition-all pr-8"
+                className="search w-full bg-[var(--surface)] border border-[var(--line)] rounded-[12px] px-[12px] py-[9px] text-[12px] sm:text-xs text-[var(--cream)] placeholder:text-[var(--tan)] font-mono focus:outline-none focus:border-[var(--pepper)] focus:ring-1 focus:ring-[var(--pepper)] transition-all pr-8 shadow-2xs"
               />
               <Search className="w-3.5 h-3.5 text-[var(--tan)] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
@@ -261,9 +237,7 @@ export default function HomeScreen() {
 
           {/* Right Controls: Theme Toggle + Avatar Button */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="hidden sm:block">
-              <ThemeToggle showLabel={false} />
-            </div>
+            <ThemeToggle showLabel={false} />
 
             <button
               type="button"
@@ -274,7 +248,7 @@ export default function HomeScreen() {
                   setShowAuthModal(true);
                 }
               }}
-              className="avatar-btn shrink-0 w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] rounded-full bg-[var(--pepper)] flex items-center justify-center font-mono text-[11px] sm:text-xs font-bold text-[var(--ink)] hover:scale-105 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cream)] overflow-hidden shadow-xs"
+              className="avatar-btn shrink-0 w-[30px] h-[30px] sm:w-[32px] sm:h-[32px] rounded-full bg-[var(--pepper)] flex items-center justify-center font-mono text-[11px] sm:text-xs font-bold text-white hover:scale-105 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pepper)] overflow-hidden shadow-xs"
               aria-label="User Profile"
             >
               {avatarUrl ? (
@@ -292,7 +266,7 @@ export default function HomeScreen() {
           </div>
         </header>
 
-        {/* 2. HERO — MONO EYEBROW + RESPONSIVE BOLD HEADLINE */}
+        {/* 2. HERO — MONO EYEBROW + BOLD TWO-LINE HEADLINE (No "Ugo", now "Chef") */}
         <section className="hero pt-2 sm:pt-4">
           <div className="eyebrow font-mono text-[10.5px] sm:text-xs tracking-[0.1em] uppercase text-[var(--palm)] mb-1.5 sm:mb-2">
             {timeString}
@@ -303,7 +277,7 @@ export default function HomeScreen() {
           </h1>
         </section>
 
-        {/* 3. PANTRY SECTION — TITLE + ITEM COUNT + COLOR-CODED TAGS */}
+        {/* 3. PANTRY SECTION — HIGH CONTRAST CATEGORY TAGS (NO GREEN) */}
         <section className="pantry pb-5 sm:pb-6 border-b border-[var(--line)]">
           <div className="pantry-head flex items-baseline justify-between mb-3">
             <h2 className="pantry-title font-display font-bold text-[14px] sm:text-base text-[var(--cream)]">
@@ -311,7 +285,7 @@ export default function HomeScreen() {
             </h2>
             <Link
               href="/pantry"
-              className="pantry-count font-mono text-[11.5px] sm:text-xs text-[var(--palm)] hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--palm)] rounded"
+              className="pantry-count font-mono text-[11.5px] sm:text-xs text-[var(--palm)] hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--palm)] rounded font-semibold"
             >
               {totalCount} items · edit
             </Link>
@@ -322,18 +296,19 @@ export default function HomeScreen() {
               <>
                 {displayItems.map((item, idx) => {
                   const category = getIngredientCategory(item);
-                  let tagClass = "bg-[rgba(255,194,75,0.16)] text-[var(--palm)]"; // default spice/other
-
+                  
+                  // Warm, high-contrast, readable tag colors without any green:
+                  let tagStyle = "bg-[var(--palm)]/15 text-[var(--palm)] border border-[var(--palm)]/30"; // spice/grain/oil
                   if (category === "protein") {
-                    tagClass = "bg-[rgba(255,90,54,0.16)] text-[#FF8A6B]";
+                    tagStyle = "bg-[var(--pepper)]/15 text-[var(--pepper)] border border-[var(--pepper)]/30";
                   } else if (category === "veg") {
-                    tagClass = "bg-[rgba(63,125,92,0.22)] text-[var(--ugu-light)]";
+                    tagStyle = "bg-[var(--berry)]/15 text-[var(--berry-light)] border border-[var(--berry)]/30";
                   }
 
                   return (
                     <span
                       key={`${item}-${idx}`}
-                      className={`tag px-[11px] sm:px-3 py-[6px] sm:py-1.5 rounded-[20px] text-[12px] sm:text-xs font-semibold capitalize ${tagClass}`}
+                      className={`tag px-[11px] sm:px-3 py-[6px] sm:py-1.5 rounded-[20px] text-[12px] sm:text-xs font-semibold capitalize transition-all ${tagStyle}`}
                     >
                       {item}
                     </span>
@@ -360,35 +335,50 @@ export default function HomeScreen() {
           </div>
         </section>
 
-        {/* 4. "COOK YOUR MOOD" SHELF — 3 SENSORY CARDS (Scroll on Mobile, Responsive Grid on Web) */}
+        {/* 4. "COOK YOUR MOOD" SHELF — CUSTOMIZABLE MOOD CARDS (NO GREEN) */}
         <section className="shelf">
           <div className="shelf-head flex items-baseline justify-between mb-3">
             <h2 className="shelf-title font-display font-bold text-[16px] sm:text-lg md:text-xl text-[var(--cream)]">
               Cook your mood
             </h2>
-            <span className="hidden sm:inline font-mono text-xs text-[var(--tan)]">
-              Saturated culinary sparks
-            </span>
+            <button
+              type="button"
+              onClick={() => setShowMoodsModal(true)}
+              className="inline-flex items-center gap-1.5 font-mono text-[11px] sm:text-xs text-[var(--pepper)] hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--pepper)] rounded py-0.5 px-1 font-semibold"
+            >
+              <SlidersHorizontal className="w-3 h-3" />
+              <span>Customize Moods</span>
+            </button>
           </div>
 
-          {/* Mobile: Horizontal scroll, Desktop: 3-column grid */}
+          {/* Mobile: Horizontal scroll, Desktop: Responsive grid */}
           <div className="flex sm:grid sm:grid-cols-3 gap-[10px] sm:gap-4 md:gap-6 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
-            {MOOD_CARDS.map((card) => (
-              <button
-                key={card.id}
-                type="button"
-                onClick={() => router.push(`/search?mood=${card.id}`)}
-                className={`mood-card shrink-0 w-[150px] sm:w-auto h-[150px] sm:h-[170px] md:h-[190px] rounded-[16px] sm:rounded-[20px] p-[14px] sm:p-5 md:p-6 flex flex-col justify-between text-left transition-all hover:scale-[1.02] sm:hover:-translate-y-1 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cream)] shadow-md ${card.colorClass}`}
-                aria-label={`Cook mood: ${card.tag} - ${card.label}`}
-              >
-                <span className={`mood-tag font-mono text-[9.5px] sm:text-xs uppercase tracking-[0.06em] ${card.tagClass}`}>
-                  {card.tag}
-                </span>
-                <span className={`mood-label font-display font-extrabold text-[17px] sm:text-xl md:text-2xl leading-[1.1] ${card.labelClass}`}>
-                  {card.label}
-                </span>
-              </button>
-            ))}
+            {moods.map((card) => {
+              const colorInfo = MOOD_COLOR_MAP[card.color] || MOOD_COLOR_MAP.pepper;
+              return (
+                <button
+                  key={card.id}
+                  type="button"
+                  onClick={() => router.push(`/search?mood=${encodeURIComponent(card.tag)}&q=${encodeURIComponent(card.context || card.label)}`)}
+                  className={`mood-card shrink-0 w-[150px] sm:w-auto h-[150px] sm:h-[170px] md:h-[190px] rounded-[16px] sm:rounded-[20px] p-[14px] sm:p-5 md:p-6 flex flex-col justify-between text-left transition-all hover:scale-[1.02] sm:hover:-translate-y-1 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cream)] shadow-md ${colorInfo.bg}`}
+                  aria-label={`Cook mood: ${card.tag} - ${card.label}`}
+                >
+                  <div>
+                    <span className={`mood-tag font-mono text-[9.5px] sm:text-xs uppercase tracking-[0.06em] block ${colorInfo.tagText}`}>
+                      {card.tag}
+                    </span>
+                    {card.context && (
+                      <span className="hidden sm:block text-[10px] opacity-75 font-body line-clamp-1 mt-0.5">
+                        {card.context}
+                      </span>
+                    )}
+                  </div>
+                  <span className={`mood-label font-display font-extrabold text-[17px] sm:text-xl md:text-2xl leading-[1.1] ${colorInfo.text}`}>
+                    {card.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </section>
 
@@ -397,7 +387,7 @@ export default function HomeScreen() {
           <button
             type="button"
             onClick={() => setShowAiModal(true)}
-            className="cta w-full bg-[var(--surface)] border border-[var(--line)] rounded-[16px] sm:rounded-[20px] p-[15px_16px] sm:p-6 flex items-center justify-between text-left hover:border-[var(--pepper)]/50 active:scale-[0.99] transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pepper)]"
+            className="cta w-full bg-[var(--surface)] border border-[var(--line)] rounded-[16px] sm:rounded-[20px] p-[15px_16px] sm:p-6 flex items-center justify-between text-left hover:border-[var(--pepper)]/50 active:scale-[0.99] transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pepper)] shadow-2xs"
           >
             <div>
               <div className="cta-text font-display font-bold text-[14px] sm:text-base md:text-lg text-[var(--cream)] group-hover:text-[var(--pepper)] transition-colors">
@@ -408,7 +398,7 @@ export default function HomeScreen() {
               </div>
             </div>
             <div
-              className="cta-arrow shrink-0 w-[30px] h-[30px] sm:w-[36px] sm:h-[36px] rounded-full bg-[var(--pepper)] text-[var(--ink)] flex items-center justify-center text-[13px] sm:text-sm font-bold group-hover:scale-105 transition-transform"
+              className="cta-arrow shrink-0 w-[30px] h-[30px] sm:w-[36px] sm:h-[36px] rounded-full bg-[var(--pepper)] text-white flex items-center justify-center text-[13px] sm:text-sm font-bold group-hover:scale-105 transition-transform shadow-xs"
               aria-hidden="true"
             >
               →
@@ -430,7 +420,7 @@ export default function HomeScreen() {
               </div>
               <Link
                 href="/search"
-                className="font-mono text-xs text-[var(--pepper)] hover:underline flex items-center gap-1"
+                className="font-mono text-xs text-[var(--pepper)] hover:underline flex items-center gap-1 font-semibold"
               >
                 <span>View all</span>
                 <ArrowRight className="w-3 h-3" />
@@ -459,6 +449,7 @@ export default function HomeScreen() {
 
       {/* Interactive Modals */}
       <AiMealSuggesterModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
+      <CustomizeMoodsModal isOpen={showMoodsModal} onClose={() => setShowMoodsModal(false)} />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   );

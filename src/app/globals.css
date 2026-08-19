@@ -1,59 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  /* The Kitchen Book Design Tokens (Redesign v2) */
-  --ink: #141310;           /* page background */
-  --surface: #1E1B16;       /* card/input background */
-  --cream: #F7F1E4;         /* primary text */
-  --tan: #A79A83;           /* secondary/muted text */
-  --pepper: #FF5A36;        /* primary accent — CTAs, active states, protein tag */
-  --palm: #FFC24B;          /* secondary accent — highlights, spice tag */
-  --ugu: #3F7D5C;           /* tertiary accent — mood card, veg tag base */
-  --ugu-light: #6DA184;     /* veg tag text on ugu tint */
-  --berry: #8B3A5A;         /* reserved for a 4th mood card */
-  --line: rgba(247, 241, 228, 0.09); /* hairline dividers/borders */
+  /* =========================================================
+     LIGHT MODE (Warm Ivory & Cocoa Palette - Zero Green)
+     ========================================================= */
+  --ink: #FAF6EE;           /* page background */
+  --surface: #FFFFFF;       /* card & input surface */
+  --surface-warm: #F4EFE6;  /* secondary surface */
+  --cream: #181511;         /* high-contrast dark espresso text */
+  --tan: #736957;           /* warm muted secondary text */
+  --pepper: #E64A26;        /* appetite pepper coral (primary accent) */
+  --palm: #D9822B;          /* warm golden palm (secondary accent) */
+  --berry: #8B3A5A;         /* rich culinary berry plum */
+  --berry-light: #B84A62;   /* berry highlight / tag color */
+  --line: rgba(24, 21, 17, 0.1); /* hairline borders */
 
-  /* Legacy semantic variables aligned to warm cocoa palette */
+  /* Legacy semantic variables aligned to warm palette */
   --background: var(--ink);
-  --background-secondary: var(--surface);
+  --background-secondary: var(--surface-warm);
   --foreground: var(--cream);
   --card: var(--surface);
   --card-foreground: var(--cream);
-  --card-warm: var(--surface);
+  --card-warm: var(--surface-warm);
   --card-muted: var(--ink);
-  --muted: var(--surface);
+  --muted: var(--surface-warm);
   --muted-foreground: var(--tan);
   --border: var(--line);
   --border-light: var(--line);
   --primary: var(--pepper);
-  --primary-foreground: var(--ink);
+  --primary-foreground: #FFFFFF;
   --accent: var(--palm);
-  --accent-foreground: var(--ink);
-  --sage: var(--ugu);
-  --sage-light: rgba(63, 125, 92, 0.22);
-  --sage-border: rgba(63, 125, 92, 0.4);
+  --accent-foreground: #FFFFFF;
 }
 
 .dark {
-  --ink: #141310;
-  --surface: #1E1B16;
-  --cream: #F7F1E4;
-  --tan: #A79A83;
-  --pepper: #FF5A36;
-  --palm: #FFC24B;
-  --ugu: #3F7D5C;
-  --ugu-light: #6DA184;
-  --berry: #8B3A5A;
-  --line: rgba(247, 241, 228, 0.09);
+  /* =========================================================
+     DARK MODE (Deep Cocoa & Warm Ember - Zero Green)
+     ========================================================= */
+  --ink: #141310;           /* deep cocoa page background */
+  --surface: #1E1B16;       /* cocoa dark card/input background */
+  --surface-warm: #26221C;  /* secondary dark surface */
+  --cream: #F7F1E4;         /* high-contrast ivory primary text */
+  --tan: #A79A83;           /* warm muted secondary text */
+  --pepper: #FF5A36;        /* vibrant pepper orange (primary accent) */
+  --palm: #FFC24B;          /* vibrant golden palm (secondary accent) */
+  --berry: #8B3A5A;         /* rich culinary berry plum */
+  --berry-light: #E085A8;   /* berry highlight text */
+  --line: rgba(247, 241, 228, 0.09); /* hairline borders */
 
   --background: var(--ink);
-  --background-secondary: var(--surface);
+  --background-secondary: var(--surface-warm);
   --foreground: var(--cream);
   --card: var(--surface);
   --card-foreground: var(--cream);
-  --card-warm: var(--surface);
+  --card-warm: var(--surface-warm);
   --card-muted: var(--ink);
-  --muted: var(--surface);
+  --muted: var(--surface-warm);
   --muted-foreground: var(--tan);
   --border: var(--line);
   --border-light: var(--line);
@@ -61,40 +63,33 @@
   --primary-foreground: var(--ink);
   --accent: var(--palm);
   --accent-foreground: var(--ink);
-  --sage: var(--ugu);
-  --sage-light: rgba(63, 125, 92, 0.22);
-  --sage-border: rgba(63, 125, 92, 0.4);
 }
 
 @theme inline {
   --color-ink: var(--ink);
   --color-surface: var(--surface);
+  --color-surface-warm: var(--surface-warm);
   --color-cream: var(--cream);
   --color-tan: var(--tan);
   --color-pepper: var(--pepper);
   --color-palm: var(--palm);
-  --color-ugu: var(--ugu);
-  --color-ugu-light: var(--ugu-light);
   --color-berry: var(--berry);
+  --color-berry-light: var(--berry-light);
   --color-line: var(--line);
 
   --color-background: var(--ink);
-  --color-background-secondary: var(--surface);
+  --color-background-secondary: var(--surface-warm);
   --color-foreground: var(--cream);
   --color-card: var(--surface);
   --color-card-foreground: var(--cream);
-  --color-card-warm: var(--surface);
+  --color-card-warm: var(--surface-warm);
   --color-card-muted: var(--ink);
-  --color-muted: var(--surface);
+  --color-muted: var(--surface-warm);
   --color-muted-foreground: var(--tan);
   --color-border: var(--line);
   --color-border-light: var(--line);
   --color-primary: var(--pepper);
-  --color-primary-foreground: var(--ink);
   --color-accent: var(--palm);
-  --color-accent-foreground: var(--ink);
-  --color-sage: var(--ugu);
-  --color-sage-light: var(--ugu-light);
 
   --font-display: var(--font-display), "Bricolage Grotesque", system-ui, sans-serif;
   --font-body: var(--font-body), "Inter", system-ui, sans-serif;
@@ -108,9 +103,10 @@ body {
   font-family: var(--font-body), 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Custom font helper classes */
+/* Typography Helper Classes */
 .font-display {
   font-family: var(--font-display), 'Bricolage Grotesque', sans-serif;
 }
@@ -121,7 +117,7 @@ body {
   font-family: var(--font-body), 'Inter', sans-serif;
 }
 
-/* Scrollbar utilities */
+/* Scrollbar and mobile utilities */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -130,7 +126,6 @@ body {
   scrollbar-width: none;
 }
 
-/* Mobile-friendly safe area */
 @supports (padding: max(0px)) {
   .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
